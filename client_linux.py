@@ -1,34 +1,43 @@
 from tkinter import *
 from tkinter import ttk
 
+import threading
+
 import socket
 
-HOST = '192.168.1.255'  # Endereco IP do Servidor
+HOST = 'localhost'  # Endereco IP do Servidor
 PORT = 5000            # Porta que o Servidor esta
 
-udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-udp.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# udp.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+username = 'leandro'
 
 dest = (HOST, PORT)
+udp.connect(dest)
 
 def send_message():
-  INPUT = inputtxt.get("1.0", "end-1c")
-  udp.sendto (INPUT.encode(), dest)
-  outputtxt.insert(END, f"Você: {INPUT}\n")
+  INPUT = text_input.get("1.0", "end-1c")
+  udp.send(f"{username}: {INPUT}".encode())
 
+def listen():
+  while True:
+    msg, cliente = udp.recvfrom(1024)
+    text_area.insert(END, f"{msg.decode()}\n")
 root = Tk()
 frm = ttk.Frame(root, padding=10)
 frm.grid()
 ttk.Label(frm, text="Chat dos menores").grid(column=0, row=0)
 
-outputtxt = Text(frm, height = 20, width = 30)
-outputtxt.grid(column=0, row=1)
+text_area = Text(frm, height = 20, width = 50)
+text_area.grid(column=0, row=1, columnspan=3)
 
-inputtxt = Text(frm, height = 1, width = 25)
-inputtxt.grid(column=0, row=2)
+text_input = Text(frm, height = 1, width = 25)
+text_input.grid(column=0, row=2)
 
 ttk.Button(frm, text="enviar", command = lambda:send_message()).grid(column=1, row=2)
+ttk.Button(frm, text="Anexar arquivo", command = lambda:send_file()).grid(column=2, row=2)
 
+threading.Thread(target=listen, args=[]).start()
 root.mainloop()
 
 
