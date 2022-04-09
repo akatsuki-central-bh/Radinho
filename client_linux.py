@@ -23,6 +23,7 @@ def listen():
   while True:
     msg, cliente = udp.recvfrom(1024)
     text_area.insert(END, f"{msg.decode()}\n")
+
 root = Tk()
 frm = ttk.Frame(root, padding=10)
 frm.grid()
@@ -39,5 +40,3 @@ ttk.Button(frm, text="Anexar arquivo", command = lambda:send_file()).grid(column
 
 threading.Thread(target=listen, args=[]).start()
 root.mainloop()
-
-
