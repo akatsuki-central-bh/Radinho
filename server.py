@@ -10,11 +10,23 @@ def start():
   udp.bind(orig)
   udp.listen(5)
 
-  conn, addr = udp.accept()
   while True:
+    conn, addr = udp.accept()
     print(f"conectado por {addr}")
     # msg, cliente = udp.recvfrom(1024)
     data = conn.recv(1024)
-    conn.sendall(data)
+    if not data:
+      break
+
+    file_size = len(data)
+    while(data):
+      print(f'sending data: {file_size}')
+      conn.sendall(data)
+      data = conn.recv(1024)
+      file_size += len(data)
+
+    print('data sended')
+    udp.shutdown(socket.SHUT_WR)
+    udp.close()
 
 start()

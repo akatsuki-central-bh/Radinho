@@ -5,11 +5,10 @@ import threading
 
 import socket
 
-HOST = 'localhost'  # Endereco IP do Servidor
-PORT = 5000            # Porta que o Servidor esta
+HOST = 'localhost'
+PORT = 5000
 
 udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# udp.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 username = 'leandro'
 
 dest = (HOST, PORT)
@@ -21,18 +20,43 @@ def send_message():
 
 def send_file():
   file = open("arquivo.docx", "rb")
-  data = file.read()
-  file.close()
-  encoded = base64.b64encode(data)
+  data = file.read(1024)
 
-  print("Sending...")
-  print(f"base64: {encoded}")
-  udp.send(encoded)
+  file_size = len(data)
+  while(data):
+    print(f'sending data: {file_size}')
+    udp.send(data)
+    data = file.read(1024)
+    file_size += len(data)
+  file.close()
+
+  print("Done Sending")
+  udp.shutdown(socket.SHUT_WR)
 
 def listen():
   while True:
-    msg, cliente = udp.recvfrom(1024)
-    text_area.insert(END, f"{msg.decode()}\n")
+    # msg, cliente = udp.recvfrom(1024)
+    # text_area.insert(END, f"{msg.decode()}\n")
+    save_file('receive.docx')
+
+def save_file(name):
+  data = udp.recv(1024)
+
+  if not data:
+    return
+
+  file = open(name, 'wb')
+
+  file_size = len(data)
+  while (data):
+    print(f'receiving data: {file_size}')
+    file.write(data)
+    data = udp.recv(1024)
+    file_size += len(data)
+
+  print('file received')
+
+  file.close()
 
 root = Tk()
 frm = ttk.Frame(root, padding=10)
@@ -47,6 +71,7 @@ text_input.grid(column=0, row=2)
 
 ttk.Button(frm, text="enviar", command = lambda:send_message()).grid(column=1, row=2)
 ttk.Button(frm, text="Anexar arquivo", command = lambda:send_file()).grid(column=2, row=2)
+# ttk.Button(frm, text="Baixar arquivo", command = lambda:save_file('receive2.docx')).grid(column=3, row=2)
 
 threading.Thread(target=listen, args=[]).start()
 root.mainloop()
