@@ -19,6 +19,16 @@ def send_message():
   INPUT = text_input.get("1.0", "end-1c")
   udp.send(f"{username}: {INPUT}".encode())
 
+def send_file():
+  file = open("arquivo.docx", "rb")
+  data = file.read()
+  file.close()
+  encoded = base64.b64encode(data)
+
+  print("Sending...")
+  print(f"base64: {encoded}")
+  udp.send(encoded)
+
 def listen():
   while True:
     msg, cliente = udp.recvfrom(1024)
