@@ -9,15 +9,20 @@ HOST = 'localhost'
 PORT = 5002
 
 udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-author = 'leandro'.ljust(20, ' ')
 
 dest = (HOST, PORT)
 udp.connect(dest)
 
+TYPE_SIZE = 4
+AUTHOR_SIZE = 20
+FILE_NAME_SIZE = 30
+
+author = 'leandro'.ljust(AUTHOR_SIZE, ' ')
+
 def send_message():
   INPUT = text_input.get("1.0", "end-1c")
   udp.send(f"mesg{author}{INPUT}".encode())
-  # udp.shutdown(socket.SHUT_WR)
+  udp.shutdown(socket.SHUT_WR)
 
 def send_file():
   file_name = "arquivo.docx"
@@ -36,19 +41,19 @@ def send_file():
   file.close()
 
   print("Done Sending")
-  # udp.shutdown(socket.SHUT_WR)
+  udp.shutdown(socket.SHUT_WR)
 
 def listen():
   while True:
-    msg, client = udp.recvfrom(24)
-    msg = msg.decode()
-
-    msg_type = msg[0:4]
-    msg_author = msg[4:24].rstrip()
+    msg_type = udp.recv(TYPE_SIZE).decode()
 
     # if not msg or msg_author == author:
-    if not msg:
+    if not msg_type:
       break
+
+    msg_author = udp.recv(AUTHOR_SIZE).decode()
+
+    print(f'type: {msg_type}, author: {msg_author}')
 
     if(msg_type == 'mesg'):
       read_message(msg_author)
@@ -56,7 +61,7 @@ def listen():
       save_file(msg_author)
 
 def read_message(author):
-  text_area.insert(END, f"{author}: ")
+  text_area.insert(END, f"{author.rstrip()}: ")
   data = udp.recv(1024)
   while (data):
     text_area.insert(END, data)
@@ -65,21 +70,19 @@ def read_message(author):
 
 
 def save_file(author):
-  file_name = udp.recv(14).decode()
-  # file_size = udp.recv(6)
+  file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
 
   data = udp.recv(1024)
-  file = open(file_name.rstrip(), 'wb')
+  file = open(f"download/{file_name}", 'wb')
 
   file_size = len(data)
   while (data):
     print(f'receiving data: {file_size}')
     file.write(data)
-    file_size += len(data)
     data = udp.recv(1024)
+    file_size += len(data)
 
-  breakpoint()
-  text_area.insert(END, f"{author}: new file\n")
+  text_area.insert(END, f"{author.rstrip()}: new file\n")
 
   file.close()
 
