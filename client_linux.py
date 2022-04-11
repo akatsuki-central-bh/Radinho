@@ -44,17 +44,16 @@ def listen():
     msg = msg.decode()
 
     msg_type = msg[0:4]
-    author = msg[4:24]
+    msg_author = msg[4:24]
 
+    # if not msg or msg_author == author:
     if not msg:
       break
 
-    # breakpoint()
-
     if(msg_type == 'mesg'):
-      read_message(author)
+      read_message(msg_author)
     else:
-      save_file(author)
+      save_file(msg_author)
 
 def read_message(author):
   text_area.insert(END, f"{author}: ")
