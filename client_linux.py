@@ -22,7 +22,7 @@ def send_message():
 def send_file():
   file_name = "arquivo.docx"
   file = open(file_name, "rb")
-  file_name_ljust = file_name.ljust(30, '0')
+  file_name_ljust = file_name.ljust(30, ' ')
 
   udp.send(f'file{author}{file_name_ljust}'.encode())
   data = file.read(1024)
@@ -44,7 +44,7 @@ def listen():
     msg = msg.decode()
 
     msg_type = msg[0:4]
-    msg_author = msg[4:24]
+    msg_author = msg[4:24].rstrip()
 
     # if not msg or msg_author == author:
     if not msg:
@@ -69,16 +69,17 @@ def save_file(author):
   # file_size = udp.recv(6)
 
   data = udp.recv(1024)
-  file = open(file_name, 'wb')
+  file = open(file_name.rstrip(), 'wb')
 
   file_size = len(data)
   while (data):
     print(f'receiving data: {file_size}')
     file.write(data)
-    data = udp.recv(1024)
     file_size += len(data)
+    data = udp.recv(1024)
 
-  print(f'{author}: new file')
+  breakpoint()
+  text_area.insert(END, f"{author}: new file\n")
 
   file.close()
 
