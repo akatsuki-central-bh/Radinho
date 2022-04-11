@@ -6,20 +6,25 @@ import threading
 import socket
 
 HOST = 'localhost'
-PORT = 5000
+PORT = 5002
 
 udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-username = 'leandro'
+author = 'leandro'.ljust(20, ' ')
 
 dest = (HOST, PORT)
 udp.connect(dest)
 
 def send_message():
   INPUT = text_input.get("1.0", "end-1c")
-  udp.send(f"{username}: {INPUT}".encode())
+  udp.send(f"mesg{author}{INPUT}".encode())
+  # udp.shutdown(socket.SHUT_WR)
 
 def send_file():
-  file = open("arquivo.docx", "rb")
+  file_name = "arquivo.docx"
+  file = open(file_name, "rb")
+  file_name_ljust = file_name.ljust(30, '0')
+
+  udp.send(f'file{author}{file_name_ljust}'.encode())
   data = file.read(1024)
 
   file_size = len(data)
@@ -31,21 +36,41 @@ def send_file():
   file.close()
 
   print("Done Sending")
-  udp.shutdown(socket.SHUT_WR)
+  # udp.shutdown(socket.SHUT_WR)
 
 def listen():
   while True:
-    # msg, cliente = udp.recvfrom(1024)
-    # text_area.insert(END, f"{msg.decode()}\n")
-    save_file('receive.docx')
+    msg, client = udp.recvfrom(24)
+    msg = msg.decode()
 
-def save_file(name):
+    msg_type = msg[0:4]
+    author = msg[4:24]
+
+    if not msg:
+      break
+
+    # breakpoint()
+
+    if(msg_type == 'mesg'):
+      read_message(author)
+    else:
+      save_file(author)
+
+def read_message(author):
+  text_area.insert(END, f"{author}: ")
   data = udp.recv(1024)
+  while (data):
+    text_area.insert(END, data)
+    data = udp.recv(1024)
+  text_area.insert(END, "\n")
 
-  if not data:
-    return
 
-  file = open(name, 'wb')
+def save_file(author):
+  file_name = udp.recv(14).decode()
+  # file_size = udp.recv(6)
+
+  data = udp.recv(1024)
+  file = open(file_name, 'wb')
 
   file_size = len(data)
   while (data):
@@ -54,7 +79,7 @@ def save_file(name):
     data = udp.recv(1024)
     file_size += len(data)
 
-  print('file received')
+  print(f'{author}: new file')
 
   file.close()
 

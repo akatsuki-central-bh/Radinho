@@ -3,7 +3,7 @@ import socket
 def start():
   print('iniciado')
   HOST = ''
-  PORT = 5000
+  PORT = 5002
   # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as udp:
   udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   orig = (HOST, PORT)
@@ -13,7 +13,7 @@ def start():
   while True:
     conn, addr = udp.accept()
     print(f"conectado por {addr}")
-    # msg, cliente = udp.recvfrom(1024)
+
     data = conn.recv(1024)
     if not data:
       break
