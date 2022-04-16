@@ -81,7 +81,7 @@ def listen():
         if(end_flag == 'end'):
           break
       except:
-        print('intraduzivel o bostil')
+        pass
 
       data = udp.recv(1024)
       response += data
