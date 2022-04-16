@@ -1,10 +1,10 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import simpledialog
 
 import threading
 
 import socket
-from tkinter import simpledialog
 
 HOST = 'localhost'
 PORT = 5001
@@ -76,12 +76,9 @@ def listen():
     response = data
 
     while(data):
-      try:
-        end_flag = data[-3:].decode()
-        if(end_flag == 'end'):
-          break
-      except:
-        pass
+      end_flag = data[-3:]
+      if(end_flag == b'end'):
+        break
 
       data = udp.recv(1024)
       response += data
