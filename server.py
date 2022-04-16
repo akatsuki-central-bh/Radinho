@@ -23,11 +23,6 @@ def handle(client):
     while True:
       data = client.recv(1024)
       broadcast(data)
-      # end_flag = data[-3:].decode()
-      # if(end_flag == 'end'):
-      #   break
-
-    print('data sended')
   except:
     clients.remove(client)
     client.close()
