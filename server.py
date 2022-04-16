@@ -6,7 +6,7 @@ clients = []
 def start():
   print('iniciado')
   HOST = ''
-  PORT = 5006
+  PORT = 5001
   udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   orig = (HOST, PORT)
   udp.bind(orig)
@@ -20,17 +20,14 @@ def start():
 
 def handle(client):
   try:
-    data = client.recv(1024)
-
-    message_size = len(data)
-    while(message_size > 0):
-      print(f'sending data: {message_size}')
-      broadcast(data)
+    while True:
       data = client.recv(1024)
-      message_size = len(data)
+      broadcast(data)
+      # end_flag = data[-3:].decode()
+      # if(end_flag == 'end'):
+      #   break
 
     print('data sended')
-    client.shutdown(socket.SHUT_WR)
   except:
     clients.remove(client)
     client.close()

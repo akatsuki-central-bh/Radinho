@@ -7,7 +7,7 @@ import socket
 from tkinter import simpledialog
 
 HOST = 'localhost'
-PORT = 5006
+PORT = 5001
 
 udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -37,10 +37,8 @@ author = author.ljust(AUTHOR_SIZE, ' ')
 
 def send_message():
   try:
-    udp.settimeout(10)
     INPUT = text_input.get("1.0", "end-1c")
-    udp.send(f"mesg{author}{INPUT}".encode())
-    udp.shutdown(socket.SHUT_WR)
+    udp.send(f"mesg{author}{INPUT}end".encode())
   except BrokenPipeError as e:
     print(e)
 
@@ -58,49 +56,72 @@ def send_file():
     udp.send(data)
     data = file.read(1024)
     message_size += len(data)
+
+  udp.send('end'.encode())
   file.close()
 
   print("Done Sending")
-  udp.shutdown(socket.SHUT_WR)
 
 def listen():
   while True:
     msg_type = udp.recv(TYPE_SIZE).decode()
     msg_author = udp.recv(AUTHOR_SIZE).decode()
 
+    file = None
+    if(msg_type == 'file'):
+      file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
+      file = open(f"download/{file_name}", 'wb')
+
+    data = udp.recv(1024)
+    response = data
+
+
+    while(data):
+      try:
+        end_flag = data[-3:].decode()
+        if(end_flag == 'end'):
+          break
+      except:
+        print('intraduzivel o bostil')
+
+      data = udp.recv(1024)
+      response += data
+
     # if not msg or msg_author == author:
-    if not msg_type:
-      continue
 
     print(f'type: {msg_type}, author: {msg_author}')
 
     if(msg_type == 'mesg'):
-      read_message(msg_author)
+      text_area.insert(END, f"{author.rstrip()}: {response.decode()[:-3]}\n")
     elif(msg_type == 'file'):
-      save_file(msg_author)
-    elif msg_author == author:
-      print('udp closed')
+      print(f'file size: {len(response[:-3])}')
+      file.write(response[:-3])
+      file.close()
       # pass
     print('message received')
 
 
 def read_message(author):
-  text_area.insert(END, f"{author.rstrip()}: ")
-
   data = udp.recv(1024)
   message_size = len(data)
 
-  while(message_size > 0):
+  while(data):
+    author = udp.recv(AUTHOR_SIZE).decode()
+    text_area.insert(END, f"{author.rstrip()}: ")
     print(f'receiving data: {message_size}')
     text_area.insert(END, data)
 
+    # end_flag = data[-3:].decode()
+    # if(end_flag == 'end'):
+    #   break
+
     data = udp.recv(1024)
     message_size = len(data)
-    print(f'receiving data: {message_size}')
 
   text_area.insert(END, "\n")
 
 def save_file(author):
+  author = udp.recv(AUTHOR_SIZE).decode()
   file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
   file = open(f"download/{file_name}", 'wb')
 
