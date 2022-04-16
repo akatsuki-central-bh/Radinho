@@ -1,32 +1,42 @@
 import socket
+import threading
+
+clients = []
 
 def start():
   print('iniciado')
   HOST = ''
-  PORT = 5002
-  # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as udp:
+  PORT = 5006
   udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   orig = (HOST, PORT)
   udp.bind(orig)
   udp.listen(5)
 
   while True:
-    conn, addr = udp.accept()
+    client, addr = udp.accept()
     print(f"conectado por {addr}")
+    clients.append(client)
+    threading.Thread(target=handle, args=[client]).start()
 
-    data = conn.recv(1024)
-    if not data:
-      break
+def handle(client):
+  try:
+    data = client.recv(1024)
 
-    file_size = len(data)
-    while(data):
-      print(f'sending data: {file_size}')
-      conn.sendall(data)
-      data = conn.recv(1024)
-      file_size += len(data)
+    message_size = len(data)
+    while(message_size > 0):
+      print(f'sending data: {message_size}')
+      broadcast(data)
+      data = client.recv(1024)
+      message_size = len(data)
 
     print('data sended')
-    udp.shutdown(socket.SHUT_WR)
-    udp.close()
+    client.shutdown(socket.SHUT_WR)
+  except:
+    clients.remove(client)
+    client.close()
+
+def broadcast(message):
+  for client in clients:
+    client.send(message)
 
 start()
