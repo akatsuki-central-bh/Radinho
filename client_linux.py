@@ -75,7 +75,6 @@ def listen():
     data = udp.recv(1024)
     response = data
 
-
     while(data):
       try:
         end_flag = data[-3:].decode()
@@ -87,8 +86,6 @@ def listen():
       data = udp.recv(1024)
       response += data
 
-    # if not msg or msg_author == author:
-
     print(f'type: {msg_type}, author: {msg_author}')
 
     if(msg_type == 'mesg'):
@@ -99,42 +96,6 @@ def listen():
       file.close()
       # pass
     print('message received')
-
-
-def read_message(author):
-  data = udp.recv(1024)
-  message_size = len(data)
-
-  while(data):
-    author = udp.recv(AUTHOR_SIZE).decode()
-    text_area.insert(END, f"{author.rstrip()}: ")
-    print(f'receiving data: {message_size}')
-    text_area.insert(END, data)
-
-    # end_flag = data[-3:].decode()
-    # if(end_flag == 'end'):
-    #   break
-
-    data = udp.recv(1024)
-    message_size = len(data)
-
-  text_area.insert(END, "\n")
-
-def save_file(author):
-  author = udp.recv(AUTHOR_SIZE).decode()
-  file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
-  file = open(f"download/{file_name}", 'wb')
-
-  data = udp.recv(1024)
-  message_size = len(data)
-  while(message_size > 0):
-    print(f'receiving data: {message_size}')
-    file.write(data)
-    data = udp.recv(1024)
-    message_size = len(data)
-
-  file.close()
-  text_area.insert(END, f"{author.rstrip()}: new file\n")
 
 threading.Thread(target=listen, args=[]).start()
 root.mainloop()
