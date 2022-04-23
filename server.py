@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+
 clients = []
+queue = []
 
 def start():
   print('iniciado')
@@ -24,15 +26,30 @@ def start():
 
 def handle(client):
   try:
+    packages = []
     while True:
-      data = client.recv(1024)
-      broadcast(data)
+      package = client.recv(1024)
+      packages.append(package)
+
+      end_flag = package[-3:]
+      if(end_flag == b'end'):
+        queue.append(packages)
+        packages = []
+        broadcast(client)
+
   except:
+    print('sheesh')
     clients.remove(client)
     client.close()
 
-def broadcast(message):
-  for client in clients:
-    client.send(message)
+def broadcast(client_sender):
+  for packages in queue:
+    for package in packages:
+      for client in clients:
+        if(client == client_sender):
+          continue
+
+        client.send(package)
+    queue.remove(packages)
 
 start()
