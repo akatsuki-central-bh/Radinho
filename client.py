@@ -2,12 +2,17 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import simpledialog
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 import threading
 
 import socket
 
 HOST = 'localhost'
-PORT = 5001
+PORT = int(os.getenv('port'))
 
 udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

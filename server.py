@@ -1,12 +1,16 @@
 import socket
 import threading
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 clients = []
 
 def start():
   print('iniciado')
   HOST = ''
-  PORT = 5001
+  PORT = int(os.getenv('port'))
   udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   orig = (HOST, PORT)
   udp.bind(orig)
