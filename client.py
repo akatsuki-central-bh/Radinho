@@ -1,3 +1,4 @@
+from fileinput import filename
 from tkinter import *
 from tkinter import ttk
 from tkinter import simpledialog
@@ -8,6 +9,7 @@ import os
 load_dotenv()
 
 import threading
+import time
 
 import socket
 
@@ -42,8 +44,9 @@ author = author.ljust(AUTHOR_SIZE, ' ')
 
 def send_message():
   try:
-    INPUT = text_input.get('1.0', 'end-1c')
-    udp.send(f'mesg{author}{INPUT}'.encode())
+    input = text_input.get('1.0', 'end-1c')
+    text_area.insert(END, f'você: {input}\n')
+    udp.send(f'mesg{author}{input}'.encode())
     udp.send('end'.encode())
   except BrokenPipeError as e:
     print(e)
@@ -54,18 +57,20 @@ def send_file():
   file_name_ljust = file_name.ljust(30, ' ')
 
   udp.send(f'file{author}{file_name_ljust}'.encode())
-  data = file.read(1024)
+  package = file.read(1024)
 
-  message_size = len(data)
-  while(data):
-    print(f'sending data: {message_size}')
-    udp.send(data)
-    data = file.read(1024)
-    message_size += len(data)
+  message_size = len(package)
+  while(package):
+    time.sleep(2)
+    print(f'sending package: {message_size}')
+    udp.send(package)
+    package = file.read(1024)
+    message_size += len(package)
 
   udp.send('end'.encode())
   file.close()
 
+  text_area.insert(END, f'você: {file_name} enviado\n')
   print('Done Sending')
 
 def listen():
@@ -73,32 +78,33 @@ def listen():
     msg_type = udp.recv(TYPE_SIZE).decode()
     msg_author = udp.recv(AUTHOR_SIZE).decode()
 
+    if(msg_author == ''):
+      continue
+
     file = None
+    file_name = ''
     if(msg_type == 'file'):
       file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
       file = open(f'download/{file_name}', 'wb')
 
-    data = udp.recv(1024)
-    response = data
+    package = udp.recv(1024)
+    response = package
 
-    while(data):
-      end_flag = data[-3:]
+    while(package):
+      end_flag = package[-3:]
       if(end_flag == b'end'):
         break
 
-      data = udp.recv(1024)
-      response += data
-
-    print(f'type: {msg_type}, author: {msg_author}')
+      package = udp.recv(1024)
+      response += package
 
     if(msg_type == 'mesg'):
       text_area.insert(END, f'{msg_author.rstrip()}: {response.decode()[:-3]}\n')
     elif(msg_type == 'file'):
+      text_area.insert(END, f'arquivo {file_name} recebido!\n')
       print(f'file size: {len(response[:-3])}')
       file.write(response[:-3])
       file.close()
-      # pass
-    print('message received')
 
 threading.Thread(target=listen, args=[]).start()
 root.mainloop()
