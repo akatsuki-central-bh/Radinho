@@ -21,7 +21,7 @@ FILE_NAME_SIZE = 30
 root = Tk()
 frm = ttk.Frame(root, padding=10)
 frm.grid()
-ttk.Label(frm, text="Chat dos menores").grid(column=0, row=0)
+ttk.Label(frm, text='Chat dos menores').grid(column=0, row=0)
 
 text_area = Text(frm, height = 20, width = 50)
 text_area.grid(column=0, row=1, columnspan=3)
@@ -29,22 +29,23 @@ text_area.grid(column=0, row=1, columnspan=3)
 text_input = Text(frm, height = 1, width = 25)
 text_input.grid(column=0, row=2)
 
-ttk.Button(frm, text="enviar", command = lambda:send_message()).grid(column=1, row=2)
-ttk.Button(frm, text="Anexar arquivo", command = lambda:send_file()).grid(column=2, row=2)
+ttk.Button(frm, text='enviar', command = lambda:send_message()).grid(column=1, row=2)
+ttk.Button(frm, text='Anexar arquivo', command = lambda:send_file()).grid(column=2, row=2)
 
 author = simpledialog.askstring('username', 'digite seu nome', parent=root)
 author = author.ljust(AUTHOR_SIZE, ' ')
 
 def send_message():
   try:
-    INPUT = text_input.get("1.0", "end-1c")
-    udp.send(f"mesg{author}{INPUT}end".encode())
+    INPUT = text_input.get('1.0', 'end-1c')
+    udp.send(f'mesg{author}{INPUT}'.encode())
+    udp.send('end'.encode())
   except BrokenPipeError as e:
     print(e)
 
 def send_file():
-  file_name = "arquivo.docx"
-  file = open(file_name, "rb")
+  file_name = 'arquivo.docx'
+  file = open(file_name, 'rb')
   file_name_ljust = file_name.ljust(30, ' ')
 
   udp.send(f'file{author}{file_name_ljust}'.encode())
@@ -60,7 +61,7 @@ def send_file():
   udp.send('end'.encode())
   file.close()
 
-  print("Done Sending")
+  print('Done Sending')
 
 def listen():
   while True:
@@ -70,7 +71,7 @@ def listen():
     file = None
     if(msg_type == 'file'):
       file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
-      file = open(f"download/{file_name}", 'wb')
+      file = open(f'download/{file_name}', 'wb')
 
     data = udp.recv(1024)
     response = data
@@ -86,7 +87,7 @@ def listen():
     print(f'type: {msg_type}, author: {msg_author}')
 
     if(msg_type == 'mesg'):
-      text_area.insert(END, f"{msg_author.rstrip()}: {response.decode()[:-3]}\n")
+      text_area.insert(END, f'{msg_author.rstrip()}: {response.decode()[:-3]}\n')
     elif(msg_type == 'file'):
       print(f'file size: {len(response[:-3])}')
       file.write(response[:-3])

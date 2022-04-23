@@ -14,7 +14,7 @@ def start():
 
   while True:
     client, addr = udp.accept()
-    print(f"conectado por {addr}")
+    print(f'conectado por {addr}')
     clients.append(client)
     threading.Thread(target=handle, args=[client]).start()
 
