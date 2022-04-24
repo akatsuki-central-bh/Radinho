@@ -76,25 +76,25 @@ def listen():
     msg_author = udp.recv(AUTHOR_SIZE).decode()
 
     if(msg_type == 'mesg'):
-      show_message(msg_author.rstrip())
+      read_message(msg_author.rstrip())
     elif(msg_type == 'file'):
       save_file(msg_author.rstrip())
 
-def show_message(msg_author):
-  response = read_message()
+def read_message(msg_author):
+  response = read_content()
   text_area.insert(END, f'{msg_author}: {response.decode()}\n')
 
 def save_file(msg_author):
   file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
   file = open(f'download/{file_name}', 'wb')
-  response = read_message()
+  response = read_content()
 
   print(f'file size: {len(response)}')
   file.write(response)
   file.close()
   text_area.insert(END, f'{msg_author} enviou um arquivo: {file_name}\n')
 
-def read_message():
+def read_content():
   package = udp.recv(1024)
   response = package
 
