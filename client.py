@@ -73,12 +73,12 @@ def send_file():
 def listen():
   while True:
     msg_type = udp.recv(TYPE_SIZE).decode()
-    msg_author = udp.recv(AUTHOR_SIZE).decode()
+    msg_author = udp.recv(AUTHOR_SIZE).decode().rstrip()
 
     if(msg_type == 'mesg'):
-      read_message(msg_author.rstrip())
+      read_message(msg_author)
     elif(msg_type == 'file'):
-      save_file(msg_author.rstrip())
+      save_file(msg_author)
 
 def read_message(msg_author):
   response = read_content()
