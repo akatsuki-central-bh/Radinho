@@ -1,4 +1,3 @@
-from fileinput import filename
 from tkinter import *
 from tkinter import ttk
 from tkinter import simpledialog
@@ -9,7 +8,6 @@ import os
 load_dotenv()
 
 import threading
-import time
 
 import socket
 
@@ -61,7 +59,6 @@ def send_file():
 
   message_size = len(package)
   while(package):
-    time.sleep(2)
     print(f'sending package: {message_size}')
     udp.send(package)
     package = file.read(1024)
@@ -78,33 +75,38 @@ def listen():
     msg_type = udp.recv(TYPE_SIZE).decode()
     msg_author = udp.recv(AUTHOR_SIZE).decode()
 
-    if(msg_author == ''):
-      continue
+    if(msg_type == 'mesg'):
+      show_message(msg_author.rstrip())
+    elif(msg_type == 'file'):
+      save_file(msg_author.rstrip())
 
-    file = None
-    file_name = ''
-    if(msg_type == 'file'):
-      file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
-      file = open(f'download/{file_name}', 'wb')
+def show_message(msg_author):
+  response = read_message()
+  text_area.insert(END, f'{msg_author}: {response.decode()}\n')
+
+def save_file(msg_author):
+  file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
+  file = open(f'download/{file_name}', 'wb')
+  response = read_message()
+
+  print(f'file size: {len(response)}')
+  file.write(response)
+  file.close()
+  text_area.insert(END, f'{msg_author} enviou um arquivo: {file_name}\n')
+
+def read_message():
+  package = udp.recv(1024)
+  response = package
+
+  while(package):
+    end_flag = package[-3:]
+    if(end_flag == b'end'):
+      break
 
     package = udp.recv(1024)
-    response = package
+    response += package
 
-    while(package):
-      end_flag = package[-3:]
-      if(end_flag == b'end'):
-        break
-
-      package = udp.recv(1024)
-      response += package
-
-    if(msg_type == 'mesg'):
-      text_area.insert(END, f'{msg_author.rstrip()}: {response.decode()[:-3]}\n')
-    elif(msg_type == 'file'):
-      text_area.insert(END, f'arquivo {file_name} recebido!\n')
-      print(f'file size: {len(response[:-3])}')
-      file.write(response[:-3])
-      file.close()
+  return response[:-3]
 
 threading.Thread(target=listen, args=[]).start()
 root.mainloop()
