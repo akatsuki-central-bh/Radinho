@@ -1,0 +1,2 @@
+tk==0.1.0
+python-dotenv==0.20.0
