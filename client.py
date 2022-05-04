@@ -1,6 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import simpledialog
+from tkinter import filedialog
+from tkinter.messagebox import showinfo
+import re
 
 from dotenv import load_dotenv
 import os
@@ -21,7 +24,7 @@ udp.connect(dest)
 
 TYPE_SIZE = 4
 AUTHOR_SIZE = 20
-FILE_NAME_SIZE = 30
+FILE_NAME_SIZE = 2000
 
 root = Tk()
 frm = ttk.Frame(root, padding=10)
@@ -35,7 +38,7 @@ text_input = Text(frm, height = 1, width = 25)
 text_input.grid(column=0, row=2)
 
 ttk.Button(frm, text='enviar', command = lambda:send_message()).grid(column=1, row=2)
-ttk.Button(frm, text='Anexar arquivo', command = lambda:send_file()).grid(column=2, row=2)
+ttk.Button(frm, text='Anexar arquivo', command = lambda:select_files()).grid(column=2, row=2)
 
 author = simpledialog.askstring('username', 'digite seu nome', parent=root)
 author = author.ljust(AUTHOR_SIZE, ' ')
@@ -49,10 +52,55 @@ def send_message():
   except BrokenPipeError as e:
     print(e)
 
-def send_file():
-  file_name = 'arquivo.docx'
-  file = open(file_name, 'rb')
-  file_name_ljust = file_name.ljust(30, ' ')
+# def send_file():
+#   file_name = 'arquivo.docx'
+#   file = open(file_name, 'rb')
+#   file_name_ljust = file_name.ljust(30, ' ')
+
+#   udp.send(f'file{author}{file_name_ljust}'.encode())
+#   package = file.read(1024)
+
+#   message_size = len(package)
+#   while(package):
+#     print(f'sending package: {message_size}')
+#     udp.send(package)
+#     package = file.read(1024)
+#     message_size += len(package)
+
+#   udp.send('end'.encode())
+#   file.close()
+
+#   text_area.insert(END, f'você: {file_name} enviado\n')
+#   print('Done Sending')
+
+def select_files():
+  filetypes = (
+    ('text files', '*.txt'),
+    ('All files', '*.*')
+  )
+
+  file_names = filedialog.askopenfilename(
+    title='Open files',
+    initialdir='/',
+    filetypes=filetypes)
+
+  # breakpoint()
+
+  path_name = ''.join(file_names)
+  file_name = ''.join(os.path.splitext(path_name))
+
+  # breakpoint()
+
+  # file_name = re.search('([a-zA-Z0-9\s_\.-():])+(.doc|.docx|.pdf|.txt)$', path_name)
+  file_name = re.search(r"\w+.\w+", path_name)
+  # print(x.group())
+  breakpoint()
+
+  file = open(path_name, 'rb')
+
+  breakpoint()
+
+  file_name_ljust = file_name.ljust(FILE_NAME_SIZE, ' ')
 
   udp.send(f'file{author}{file_name_ljust}'.encode())
   package = file.read(1024)

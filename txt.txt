@@ -1,0 +1,3 @@
+print-1 = Ao inicializar o cliente, ele permite que você escolha o nome no qual você deseja ser identificador.
+print-2 = Podemos ter a resposta de cada cliente, assim tendo um chat
+Gif-1 = mostra que funciona o chat e estamos trabalhando no front para o user poder fazer a escolha do arquivo a ser enviado
