@@ -81,16 +81,16 @@ def listen():
       save_file(msg_author)
 
 def read_message(msg_author):
-  response = read_content()
-  text_area.insert(END, f'{msg_author}: {response.decode()}\n')
+  content = read_content()
+  text_area.insert(END, f'{msg_author}: {content.decode()}\n')
 
 def save_file(msg_author):
   file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
   file = open(f'download/{file_name}', 'wb')
-  response = read_content()
+  content = read_content()
 
-  print(f'file size: {len(response)}')
-  file.write(response)
+  print(f'file size: {len(content)}')
+  file.write(content)
   file.close()
   text_area.insert(END, f'{msg_author} enviou um arquivo: {file_name}\n')
 
