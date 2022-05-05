@@ -110,13 +110,11 @@ def read_content():
   package = udp.recv(1024)
   response = package
 
-  while(package):
-    end_flag = package[-3:]
-    if(end_flag == b'end'):
-      break
-
+  end_flag = package[-3:]
+  while(end_flag != b'end'):
     package = udp.recv(1024)
     response += package
+    end_flag = package[-3:]
 
   return response[:-3]
 
