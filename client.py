@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import simpledialog
+from tkinter import filedialog
 
 from dotenv import load_dotenv
 import os
@@ -11,7 +12,7 @@ import threading
 
 import socket
 
-HOST = 'localhost'
+HOST = str(os.getenv('host'))
 PORT = int(os.getenv('port'))
 
 udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -22,6 +23,7 @@ udp.connect(dest)
 TYPE_SIZE = 4
 AUTHOR_SIZE = 20
 FILE_NAME_SIZE = 30
+END_FLAG = 'endmessage'.encode()
 
 root = Tk()
 frm = ttk.Frame(root, padding=10)
@@ -35,7 +37,7 @@ text_input = Text(frm, height = 1, width = 25)
 text_input.grid(column=0, row=2)
 
 ttk.Button(frm, text='enviar', command = lambda:send_message()).grid(column=1, row=2)
-ttk.Button(frm, text='Anexar arquivo', command = lambda:send_file()).grid(column=2, row=2)
+ttk.Button(frm, text='Anexar arquivo', command = lambda:select_files()).grid(column=2, row=2)
 
 author = simpledialog.askstring('username', 'digite seu nome', parent=root)
 author = author.ljust(AUTHOR_SIZE, ' ')
@@ -45,26 +47,37 @@ def send_message():
     input = text_input.get('1.0', 'end-1c')
     text_area.insert(END, f'você: {input}\n')
     udp.send(f'mesg{author}{input}'.encode())
-    udp.send('end'.encode())
+    udp.send(END_FLAG)
   except BrokenPipeError as e:
     print(e)
 
-def send_file():
-  file_name = 'arquivo.docx'
-  file = open(file_name, 'rb')
-  file_name_ljust = file_name.ljust(30, ' ')
+def select_files():
+  filetypes = (
+    ('All files', '*.*'),
+    ('text files', '*.txt')
+  )
+
+  path_name = filedialog.askopenfilename(
+    title='Open files',
+    initialdir='/',
+    filetypes=filetypes)
+
+  file_name = os.path.basename(path_name)
+  file = open(path_name, 'rb')
+
+  file_name_ljust = file_name.ljust(FILE_NAME_SIZE, ' ')
 
   udp.send(f'file{author}{file_name_ljust}'.encode())
   package = file.read(1024)
 
   message_size = len(package)
   while(package):
-    print(f'sending package: {message_size}')
     udp.send(package)
     package = file.read(1024)
     message_size += len(package)
 
-  udp.send('end'.encode())
+  print(f'sended package: {message_size}')
+  udp.send(END_FLAG)
   file.close()
 
   text_area.insert(END, f'você: {file_name} enviado\n')
@@ -72,13 +85,16 @@ def send_file():
 
 def listen():
   while True:
-    msg_type = udp.recv(TYPE_SIZE).decode()
-    msg_author = udp.recv(AUTHOR_SIZE).decode().rstrip()
+    try:
+      msg_type = udp.recv(TYPE_SIZE)
+      msg_author = udp.recv(AUTHOR_SIZE)
 
-    if(msg_type == 'mesg'):
-      read_message(msg_author)
-    elif(msg_type == 'file'):
-      save_file(msg_author)
+      if(msg_type.decode() == 'mesg'):
+        read_message(msg_author.decode().rstrip())
+      elif(msg_type.decode() == 'file'):
+        save_file(msg_author.decode().rstrip())
+    except UnicodeDecodeError as e:
+      print(f'msg_type: {msg_type}, msg_author: {msg_author}')
 
 def read_message(msg_author):
   content = read_content()
@@ -90,6 +106,7 @@ def save_file(msg_author):
   content = read_content()
 
   print(f'file size: {len(content)}')
+
   file.write(content)
   file.close()
   text_area.insert(END, f'{msg_author} enviou um arquivo: {file_name}\n')
@@ -98,15 +115,15 @@ def read_content():
   package = udp.recv(1024)
   response = package
 
-  while(package):
-    end_flag = package[-3:]
-    if(end_flag == b'end'):
+  while(True):
+    end_flag = package[-10:]
+    if(end_flag == END_FLAG):
       break
 
     package = udp.recv(1024)
     response += package
 
-  return response[:-3]
+  return response[:-10]
 
 threading.Thread(target=listen, args=[]).start()
 root.mainloop()
