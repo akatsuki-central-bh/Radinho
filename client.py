@@ -22,7 +22,7 @@ udp.connect(dest)
 
 TYPE_SIZE = 4
 AUTHOR_SIZE = 20
-FILE_NAME_SIZE = 2000
+FILE_NAME_SIZE = 30
 
 root = Tk()
 frm = ttk.Frame(root, padding=10)
