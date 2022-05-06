@@ -31,7 +31,7 @@ def handle(client):
       package = client.recv(1024)
       packages.append(package)
 
-      end_flag = package[-3:]
+      end_flag = package[-10:]
       if(end_flag == 'endmessage'.encode()):
         queue.append(packages)
         packages = []

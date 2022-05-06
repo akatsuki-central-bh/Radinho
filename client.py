@@ -115,14 +115,14 @@ def read_content():
   response = package
 
   while(True):
-    end_flag = package[-3:]
+    end_flag = package[-10:]
     if(end_flag == END_FLAG):
       break
 
     package = udp.recv(1024)
     response += package
 
-  return response[:-3]
+  return response[:-10]
 
 threading.Thread(target=listen, args=[]).start()
 root.mainloop()
