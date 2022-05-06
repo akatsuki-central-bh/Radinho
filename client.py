@@ -12,7 +12,7 @@ import threading
 
 import socket
 
-HOST = 'localhost'
+HOST = str(os.getenv('host'))
 PORT = int(os.getenv('port'))
 
 udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -62,7 +62,7 @@ def select_files():
     filetypes=filetypes)
 
   file_name = os.path.basename(path_name)
-  file = open(path_name, 'rb', encoding='iso8859-1')
+  file = open(path_name, 'r', encoding='utf-8', errors='ignore')
 
   file_name_ljust = file_name.ljust(FILE_NAME_SIZE, ' ')
 
@@ -71,7 +71,7 @@ def select_files():
 
   message_size = len(package)
   while(package):
-    udp.send(package)
+    udp.send(package.encode())
     package = file.read(1024)
     message_size += len(package)
 
@@ -98,11 +98,11 @@ def read_message(msg_author):
 
 def save_file(msg_author):
   file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
-  file = open(f'download/{file_name}', 'wb', encoding='iso8859-1')
+  file = open(path_name, 'w', encoding='utf-8', errors='ignore')
   content = read_content()
 
   print(f'file size: {len(content)}')
-  file.write(content)
+  file.write(content.decode())
   file.close()
   text_area.insert(END, f'{msg_author} enviou um arquivo: {file_name}\n')
 
@@ -116,10 +116,7 @@ def read_content():
     if(end_flag == b'end'):
       break
 
-    if(len(package) < 1024):
-      print(package)
     package = udp.recv(1024)
-    package = unicode(package, errors='ignore')
     print(len(package))
     response += package
 
