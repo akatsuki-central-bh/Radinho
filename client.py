@@ -119,6 +119,7 @@ def read_content():
     if(len(package) < 1024):
       print(package)
     package = udp.recv(1024)
+    package = unicode(package, errors='ignore')
     print(len(package))
     response += package
 
