@@ -63,7 +63,7 @@ def select_files():
     filetypes=filetypes)
 
   file_name = os.path.basename(path_name)
-  file = open(path_name, 'r', encoding='utf-8', errors='ignore')
+  file = open(path_name, 'rb')
 
   file_name_ljust = file_name.ljust(FILE_NAME_SIZE, ' ')
 
@@ -72,7 +72,7 @@ def select_files():
 
   message_size = len(package)
   while(package):
-    udp.send(package.encode())
+    udp.send(package)
     package = file.read(1024)
     message_size += len(package)
 
@@ -102,11 +102,12 @@ def read_message(msg_author):
 
 def save_file(msg_author):
   file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
-  file = open(f'download/{file_name}', 'w', encoding='utf-8', errors='ignore')
+  file = open(f'download/{file_name}', 'wb')
   content = read_content()
 
   print(f'file size: {len(content)}')
-  file.write(content.decode())
+
+  file.write(content)
   file.close()
   text_area.insert(END, f'{msg_author} enviou um arquivo: {file_name}\n')
 
