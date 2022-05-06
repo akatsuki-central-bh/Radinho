@@ -32,7 +32,7 @@ def handle(client):
       packages.append(package)
 
       end_flag = package[-3:]
-      if(end_flag == b'end'):
+      if(end_flag == b'endmessage'):
         queue.append(packages)
         packages = []
         broadcast(client)
@@ -43,6 +43,7 @@ def handle(client):
     client.close()
 
 def broadcast(client_sender):
+  print('enviando para todos os clientes')
   for packages in queue:
     for package in packages:
       for client in clients:

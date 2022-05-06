@@ -23,7 +23,7 @@ udp.connect(dest)
 TYPE_SIZE = 4
 AUTHOR_SIZE = 20
 FILE_NAME_SIZE = 30
-END_FLAG = b'end'
+END_FLAG = 'endmessage'.encode()
 
 root = Tk()
 frm = ttk.Frame(root, padding=10)
