@@ -32,7 +32,7 @@ def handle(client):
       packages.append(package)
 
       end_flag = package[-3:]
-      if(end_flag == b'endmessage'):
+      if(end_flag == 'endmessage'.encode()):
         queue.append(packages)
         packages = []
         broadcast(client)
