@@ -98,7 +98,7 @@ def read_message(msg_author):
 
 def save_file(msg_author):
   file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
-  file = open(path_name, 'w', encoding='utf-8', errors='ignore')
+  file = open(f'download/{file_name}', 'w', encoding='utf-8', errors='ignore')
   content = read_content()
 
   print(f'file size: {len(content)}')
