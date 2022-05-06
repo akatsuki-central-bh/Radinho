@@ -52,8 +52,8 @@ def send_message():
 
 def select_files():
   filetypes = (
-    ('text files', '*.txt'),
-    ('All files', '*.*')
+    ('All files', '*.*'),
+    ('text files', '*.txt')
   )
 
   path_name = filedialog.askopenfilename(
@@ -71,11 +71,11 @@ def select_files():
 
   message_size = len(package)
   while(package):
-    print(f'sending package: {message_size}')
     udp.send(package)
     package = file.read(1024)
     message_size += len(package)
 
+  print(f'sended package: {message_size}')
   udp.send('end'.encode())
   file.close()
 
@@ -109,12 +109,18 @@ def save_file(msg_author):
 def read_content():
   package = udp.recv(1024)
   response = package
+  print(package)
 
-  end_flag = package[-3:]
-  while(end_flag != b'end'):
-    package = udp.recv(1024)
-    response += package
+  while(True):
     end_flag = package[-3:]
+    if(end_flag == b'end'):
+      break
+
+    if(len(package) < 1024):
+      print(package)
+    package = udp.recv(1024)
+    print(len(package))
+    response += package
 
   return response[:-3]
 
