@@ -62,7 +62,7 @@ def select_files():
     filetypes=filetypes)
 
   file_name = os.path.basename(path_name)
-  file = open(path_name, 'rb')
+  file = open(path_name, 'rb', encoding='iso8859-1')
 
   file_name_ljust = file_name.ljust(FILE_NAME_SIZE, ' ')
 
@@ -98,7 +98,7 @@ def read_message(msg_author):
 
 def save_file(msg_author):
   file_name = udp.recv(FILE_NAME_SIZE).decode().rstrip()
-  file = open(f'download/{file_name}', 'wb')
+  file = open(f'download/{file_name}', 'wb', encoding='iso8859-1')
   content = read_content()
 
   print(f'file size: {len(content)}')
