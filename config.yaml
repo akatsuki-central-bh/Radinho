@@ -11,4 +11,6 @@ flags:
   delete_user: 'APGC'
   login: 'LOGN'
   logout: 'LOGT'
+  success: 'SUSS'
+  token: 'TOKN'
   end: 'endmessage'
