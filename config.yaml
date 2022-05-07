@@ -1,0 +1,14 @@
+sizes:
+  type: 4
+  token: 16
+  login: 20
+  password: 32
+  file_name: 30
+
+flags:
+  register: 'CADT'
+  alter_password: 'ALTS'
+  delete_user: 'APGC'
+  login: 'LOGN'
+  logout: 'LOGT'
+  end: 'endmessage'
