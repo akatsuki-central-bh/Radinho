@@ -1,7 +1,7 @@
 import sqlite3
 import secrets
 
-connection = sqlite3.connect('database/database.db')
+connection = sqlite3.connect('database.db')
 
 cursor = connection.cursor()
 
@@ -17,11 +17,11 @@ def get_username(token):
   cursor.execute("SELECT username FROM users WHERE token = :token LIMIT 1", {"token": token})
   return cursor.fetchone()[0]
 
-def alter_password(token, password, last_password):
-  cursor.execute("UPDATE users SET password = ? WHERE token = ? AND password = ?", (token, password, last_password))
+def alter_password(token, new_password, current_password):
+  cursor.execute("UPDATE users SET password = ? WHERE token = ? AND password = ?", (token, new_password, current_password))
   connection.commit()
 
-def username(username, password):
+def login(username, password):
   token = generate_token()
   cursor.execute(
     "UPDATE users SET token = ? WHERE username = ? AND password = ?", (token, username, password)
