@@ -26,18 +26,18 @@ FILE_NAME_SIZE = 30
 END_FLAG = 'endmessage'.encode()
 
 root = Tk()
-frm = ttk.Frame(root, padding=10)
-frm.grid()
-ttk.Label(frm, text='Chat dos menores').grid(column=0, row=0)
+frame = ttk.Frame(root, padding=10)
+frame.grid()
+ttk.Label(frame, text='Chat dos menores').grid(column=0, row=0)
 
-text_area = Text(frm, height = 20, width = 50)
+text_area = Text(frame, height = 20, width = 50)
 text_area.grid(column=0, row=1, columnspan=3)
 
-text_input = Text(frm, height = 1, width = 25)
+text_input = Text(frame, height = 1, width = 25)
 text_input.grid(column=0, row=2)
 
-ttk.Button(frm, text='enviar', command = lambda:send_message()).grid(column=1, row=2)
-ttk.Button(frm, text='Anexar arquivo', command = lambda:select_files()).grid(column=2, row=2)
+ttk.Button(frame, text='enviar', command = lambda:send_message()).grid(column=1, row=2)
+ttk.Button(frame, text='Anexar arquivo', command = lambda:select_files()).grid(column=2, row=2)
 
 author = simpledialog.askstring('username', 'digite seu nome', parent=root)
 author = author.ljust(AUTHOR_SIZE, ' ')
