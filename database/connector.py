@@ -6,25 +6,25 @@ connection = sqlite3.connect('database/database.db')
 cursor = connection.cursor()
 
 def create_database():
-  cursor.execute("CREATE TABLE users (login text, password text, token text)")
+  cursor.execute("CREATE TABLE users (username text, password text, token text)")
   connection.commit()
 
-def create_user(login, password):
-  cursor.execute("INSERT INTO users VALUES (?, ?, NULL)", (login, password))
+def create_user(username, password):
+  cursor.execute("INSERT INTO users VALUES (?, ?, NULL)", (username, password))
   connection.commit()
 
-def get_login(token):
-  cursor.execute("SELECT login FROM users WHERE token = :token LIMIT 1", {"token": token})
+def get_username(token):
+  cursor.execute("SELECT username FROM users WHERE token = :token LIMIT 1", {"token": token})
   return cursor.fetchone()[0]
 
 def alter_password(token, password, last_password):
   cursor.execute("UPDATE users SET password = ? WHERE token = ? AND password = ?", (token, password, last_password))
   connection.commit()
 
-def login(login, password):
+def username(username, password):
   token = generate_token()
   cursor.execute(
-    "UPDATE users SET token = ? WHERE login = ? AND password = ?", (token, login, password)
+    "UPDATE users SET token = ? WHERE username = ? AND password = ?", (token, username, password)
   )
   connection.commit()
 
@@ -40,3 +40,5 @@ def generate_token():
 def disconnect():
   connection.close()
 
+# breakpoint()
+# select_user(b'r\x8f>\x92dH\xad\xcf\xbf\x87\xceve"%\x0e')
