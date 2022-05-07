@@ -39,15 +39,15 @@ def handle(client):
     while True:
       msg_type = client.recv(config_sizes['type'])
 
-      if(msg_type.decode() == config['register']):
+      if(msg_type.decode() == config_flags['register']):
         pass
-      elif(msg_type.decode() == config['alter_password']):
+      elif(msg_type.decode() == config_flags['alter_password']):
         pass
-      elif(msg_type.decode() == config['delete_user']):
+      elif(msg_type.decode() == config_flags['delete_user']):
         pass
-      elif(msg_type.decode() == config['login']):
+      elif(msg_type.decode() == config_flags['login']):
         pass
-      elif(msg_type.decode() == config['logout']):
+      elif(msg_type.decode() == config_flags['logout']):
         pass
       else:
         package = client.recv(1024)

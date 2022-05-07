@@ -1,7 +1,7 @@
 sizes:
   type: 4
   token: 16
-  login: 20
+  username: 20
   password: 32
   file_name: 30
 
