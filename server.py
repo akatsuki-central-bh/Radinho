@@ -1,3 +1,4 @@
+from email.policy import default
 import sqlite3
 
 import socket
@@ -35,34 +36,39 @@ def start():
 
 def handle(client):
   try:
-    packages = []
     while True:
       msg_type = client.recv(config_sizes['type'])
+      msg_type = msg_type.decode()
 
-      if(msg_type.decode() == config_flags['register']):
+      if(msg_type == config_flags['register']):
         pass
-      elif(msg_type.decode() == config_flags['alter_password']):
+      elif(msg_type == config_flags['alter_password']):
         pass
-      elif(msg_type.decode() == config_flags['delete_user']):
+      elif(msg_type == config_flags['delete_user']):
         pass
-      elif(msg_type.decode() == config_flags['login']):
+      elif(msg_type == config_flags['login']):
         pass
-      elif(msg_type.decode() == config_flags['logout']):
+      elif(msg_type == config_flags['logout']):
         pass
       else:
-        package = client.recv(1024)
-        packages.append(package)
-
-        end_flag = package[-10:]
-        if(end_flag == config_flags['end'].encode()):
-          queue.append(packages)
-          packages = []
-          broadcast(client)
-
+        default_flow(msg_type, client)
   except:
     print('sheesh')
     clients.remove(client)
     client.close()
+
+def default_flow(msg_type, client):
+  packages = [msg_type]
+
+  while(True):
+    package = client.recv(1024)
+    packages.append(package)
+
+    end_flag = package[-10:]
+    if(end_flag == config_flags['end'].encode()):
+      queue.append(packages)
+      broadcast(client)
+      break
 
 def broadcast(client_sender):
   print('enviando para todos os clientes')
