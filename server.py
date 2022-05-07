@@ -1,5 +1,6 @@
 import socket
 import threading
+import connector
 
 from dotenv import load_dotenv
 import os
@@ -38,21 +39,44 @@ def handle(client):
       msg_type = msg_type.decode()
 
       if(msg_type == config_flags['register']):
-        pass
+        register(client)
       elif(msg_type == config_flags['alter_password']):
-        pass
-      elif(msg_type == config_flags['delete_user']):
-        pass
+        alter_password(client)
       elif(msg_type == config_flags['login']):
-        pass
+        login(client)
       elif(msg_type == config_flags['logout']):
-        pass
+        logout(client)
       else:
         default_flow(msg_type, client)
   except:
     print('sheesh')
     clients.remove(client)
     client.close()
+
+def register(client):
+  username = client.recv(config_sizes['username'])
+  password = client.recv(config_sizes['password'])
+  connector.create_user(username, password)
+
+  client.send(config_flags['success'].encode())
+def alter_password(client):
+  token = client.recv(config_sizes['token'])
+  new_password = client.recv(config_sizes['password'])
+  current_password = client.recv(config_sizes['password'])
+  connector.alter_password(token, new_password, current_password)
+
+  client.send(config_flags['success'].encode())
+def login(client):
+  username = client.recv(config_sizes['username'])
+  password = client.recv(config_sizes['password'])
+  token = connector.login(username, password)
+
+  success_message = config_flags['token'] + token + config_flags['end']
+  client.send(success_message.encode())
+
+def logout(client):
+  token = client.recv(config_sizes['token'])
+  connector.logout(token)
 
 def default_flow(msg_type, client):
   packages = [msg_type]
