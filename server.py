@@ -1,6 +1,3 @@
-from email.policy import default
-import sqlite3
-
 import socket
 import threading
 
