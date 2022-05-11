@@ -93,9 +93,9 @@ def listen():
       msg_type = udp.recv(config_sizes['type'])
       msg_author = udp.recv(config_sizes['username'])
 
-      if(msg_type.decode() == 'mesg'):
+      if(msg_type.decode() == message_types['message']):
         read_message(msg_author.decode().rstrip())
-      elif(msg_type.decode() == 'file'):
+      elif(msg_type.decode() == message_types['file']):
         save_file(msg_author.decode().rstrip())
     except UnicodeDecodeError as e:
       print(f'msg_type: {msg_type}, msg_author: {msg_author}')
