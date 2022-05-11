@@ -5,14 +5,16 @@ sizes:
   password: 32
   file_name: 30
 
-flags:
+message_types:
   message: 'MESG'
   file: 'FILE'
   register: 'CADT'
   alter_password: 'ALTS'
-  delete_user: 'APGC'
+  delete_user: 'DELU'
   login: 'LOGN'
   logout: 'LOGT'
+
+flags:
   success: 'SUSS'
   token: 'TOKN'
-  end: 'endmessage'
+  end: 'ENDMESSAGE'

@@ -10,6 +10,7 @@ import yaml
 config_file = open("config.yaml", 'r')
 config = yaml.safe_load(config_file)
 config_sizes = config['sizes']
+message_types = config['message_types']
 config_flags = config['flags']
 
 load_dotenv()
@@ -38,13 +39,13 @@ def handle(client):
       msg_type = client.recv(config_sizes['type'])
       msg_type = msg_type.decode()
 
-      if(msg_type == config_flags['register']):
+      if(msg_type == message_types['register']):
         register(client)
-      elif(msg_type == config_flags['alter_password']):
+      elif(msg_type == message_types['alter_password']):
         alter_password(client)
-      elif(msg_type == config_flags['login']):
+      elif(msg_type == message_types['login']):
         login(client)
-      elif(msg_type == config_flags['logout']):
+      elif(msg_type == message_types['logout']):
         logout(client)
       else:
         default_flow(msg_type, client)
@@ -58,14 +59,14 @@ def register(client):
   password = client.recv(config_sizes['password'])
   connector.create_user(username, password)
 
-  client.send(config_flags['success'].encode())
+  client.send(message_types['success'].encode())
 def alter_password(client):
   token = client.recv(config_sizes['token'])
   new_password = client.recv(config_sizes['password'])
   current_password = client.recv(config_sizes['password'])
   connector.alter_password(token, new_password, current_password)
 
-  client.send(config_flags['success'].encode())
+  client.send(message_types['success'].encode())
 def login(client):
   username = client.recv(config_sizes['username'])
   password = client.recv(config_sizes['password'])

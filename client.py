@@ -19,6 +19,7 @@ PORT = int(os.getenv('port'))
 config_file = open("config.yaml", 'r')
 config = yaml.safe_load(config_file)
 config_sizes = config['sizes']
+message_types = config['message_types']
 config_flags = config['flags']
 
 udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -47,7 +48,7 @@ def send_message():
   try:
     input = text_input.get('1.0', 'end-1c')
     text_area.insert(END, f'você: {input}\n')
-    flag_message = config_flags['message']
+    flag_message = message_types['message']
     udp.send(f'{flag_message}{author}{input}'.encode())
     udp.send(config_flags['end'].encode())
   except BrokenPipeError as e:
@@ -69,7 +70,7 @@ def select_files():
 
   file_name_ljust = file_name.ljust(config_sizes['file_name'], ' ')
 
-  flag_file = config_flags['file']
+  flag_file = message_types['file']
   udp.send(f'{flag_file}{author}{file_name_ljust}'.encode())
   package = file.read(1024)
 
