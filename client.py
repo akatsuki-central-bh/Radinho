@@ -47,7 +47,8 @@ def send_message():
   try:
     input = text_input.get('1.0', 'end-1c')
     text_area.insert(END, f'você: {input}\n')
-    udp.send(f'mesg{author}{input}'.encode())
+    flag_message = config_flags['message']
+    udp.send(f'{flag_message}{author}{input}'.encode())
     udp.send(config_flags['end'].encode())
   except BrokenPipeError as e:
     print(e)
@@ -68,7 +69,8 @@ def select_files():
 
   file_name_ljust = file_name.ljust(config_sizes['file_name'], ' ')
 
-  udp.send(f'file{author}{file_name_ljust}'.encode())
+  flag_file = config_flags['file']
+  udp.send(f'{flag_file}{author}{file_name_ljust}'.encode())
   package = file.read(1024)
 
   message_size = len(package)

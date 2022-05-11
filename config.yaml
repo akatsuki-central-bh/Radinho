@@ -6,6 +6,8 @@ sizes:
   file_name: 30
 
 flags:
+  message: 'MESG'
+  file: 'FILE'
   register: 'CADT'
   alter_password: 'ALTS'
   delete_user: 'APGC'
