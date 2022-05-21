@@ -1,0 +1,20 @@
+sizes:
+  type: 4
+  token: 16
+  username: 20
+  password: 32
+  file_name: 30
+
+message_types:
+  message: 'MESG'
+  file: 'FILE'
+  register: 'CADT'
+  alter_password: 'ALTS'
+  delete_user: 'DELU'
+  login: 'LOGN'
+  logout: 'LOGT'
+
+flags:
+  success: 'SUSS'
+  token: 'TOKN'
+  end: 'ENDMESSAGE'
