@@ -80,7 +80,7 @@ def logout(client):
   connector.logout(token)
 
 def default_flow(msg_type, client):
-  packages = [msg_type]
+  packages = [msg_type.encode()]
 
   while(True):
     package = client.recv(1024)
