@@ -6,7 +6,7 @@ connection = sqlite3.connect('database.db')
 cursor = connection.cursor()
 
 def create_database():
-  cursor.execute("CREATE TABLE users (username text, password text, token text)")
+  cursor.execute("CREATE TABLE IF NOT EXISTS users (username text, password text, token text)")
   connection.commit()
 
 def create_user(username, password):
