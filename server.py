@@ -13,6 +13,7 @@ config_sizes = config['sizes']
 message_types = config['message_types']
 config_flags = config['flags']
 
+connector.create_database()
 load_dotenv()
 
 clients = []
