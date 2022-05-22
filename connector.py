@@ -1,7 +1,7 @@
 import sqlite3
 import secrets
 
-connection = sqlite3.connect('database.db')
+connection = sqlite3.connect('database.db', check_same_thread=False)
 
 cursor = connection.cursor()
 
@@ -39,6 +39,3 @@ def generate_token():
 
 def disconnect():
   connection.close()
-
-# breakpoint()
-# select_user(b'r\x8f>\x92dH\xad\xcf\xbf\x87\xceve"%\x0e')
