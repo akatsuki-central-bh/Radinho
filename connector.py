@@ -35,7 +35,7 @@ def logout(token):
   connection.commit()
 
 def generate_token():
-  return secrets.token_bytes(16)
+  return secrets.token_hex(8)
 
 def disconnect():
   connection.close()

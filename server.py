@@ -69,19 +69,21 @@ def alter_password(client):
 
   client.send(message_types['success'].encode())
 def login(client):
-  username = client.recv(config_sizes['username'])
-  password = client.recv(config_sizes['password'])
-  token = connector.login(username, password)
+  username = client.recv(config_sizes['username']).decode().rstrip()
+  password = client.recv(config_sizes['password']).decode().rstrip()
 
-  success_message = config_flags['token'] + token + config_flags['end']
-  client.send(success_message.encode())
+  token = connector.login(username, password)
+  client.send(config_flags['token'].encode())
+  client.send(token.encode())
 
 def logout(client):
   token = client.recv(config_sizes['token'])
   connector.logout(token)
 
 def default_flow(msg_type, client):
-  packages = [msg_type.encode()]
+  token = client.recv(config_sizes['token']).decode()
+  author = connector.get_username(token).encode()
+  packages = [msg_type.encode(), author]
 
   while(True):
     package = client.recv(1024)

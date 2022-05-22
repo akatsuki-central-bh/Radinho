@@ -1,3 +1,5 @@
+import login_frame
+
 from tkinter import *
 from tkinter import ttk
 from tkinter import simpledialog
@@ -27,29 +29,12 @@ udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 dest = (HOST, PORT)
 udp.connect(dest)
 
-root = Tk()
-frame = ttk.Frame(root, padding=10)
-frame.grid()
-ttk.Label(frame, text='Chat dos menores').grid(column=0, row=0)
-
-text_area = Text(frame, height = 20, width = 50)
-text_area.grid(column=0, row=1, columnspan=3)
-
-text_input = Text(frame, height = 1, width = 25)
-text_input.grid(column=0, row=2)
-
-ttk.Button(frame, text='enviar', command = lambda:send_message()).grid(column=1, row=2)
-ttk.Button(frame, text='Anexar arquivo', command = lambda:select_files()).grid(column=2, row=2)
-
-author = simpledialog.askstring('username', 'digite seu nome', parent=root)
-author = author.ljust(config_sizes['username'], ' ')
-
 def send_message():
   try:
     input = text_input.get('1.0', 'end-1c')
     text_area.insert(END, f'você: {input}\n')
     flag_message = message_types['message']
-    udp.send(f'{flag_message}{author}{input}'.encode())
+    udp.send(f'{flag_message}{token}{input}'.encode())
     udp.send(config_flags['end'].encode())
   except BrokenPipeError as e:
     print(e)
@@ -71,7 +56,7 @@ def select_files():
   file_name_ljust = file_name.ljust(config_sizes['file_name'], ' ')
 
   flag_file = message_types['file']
-  udp.send(f'{flag_file}{author}{file_name_ljust}'.encode())
+  udp.send(f'{flag_file}{token}{file_name_ljust}'.encode())
   package = file.read(1024)
 
   message_size = len(package)
@@ -128,6 +113,39 @@ def read_content():
     response += package
 
   return response[:-10]
+
+def login():
+  user = login_frame.main()
+
+  username = user[0]
+  password = user[1]
+
+  username = username.ljust(config_sizes['username'], ' ')
+  password = password.ljust(config_sizes['password'], ' ')
+
+  udp.send(f"{message_types['login']}{username}{password}".encode())
+  msg_type = udp.recv(config_sizes['type']).decode()
+
+  if msg_type == config_flags['token']:
+    return udp.recv(config_sizes['token'])
+  else:
+    login()
+
+token = login().decode()
+
+root = Tk()
+frame = ttk.Frame(root, padding=10)
+frame.grid()
+ttk.Label(frame, text='Chat dos menores').grid(column=0, row=0)
+
+text_area = Text(frame, height = 20, width = 50)
+text_area.grid(column=0, row=1, columnspan=3)
+
+text_input = Text(frame, height = 1, width = 25)
+text_input.grid(column=0, row=2)
+
+ttk.Button(frame, text='enviar', command = lambda:send_message()).grid(column=1, row=2)
+ttk.Button(frame, text='Anexar arquivo', command = lambda:select_files()).grid(column=2, row=2)
 
 threading.Thread(target=listen, args=[]).start()
 root.mainloop()
