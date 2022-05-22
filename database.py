@@ -19,7 +19,7 @@ def create_database():
   connection.commit()
 
 def create_user(username, password):
-  cursor.execute("INSERT INTO users VALUES (?, ?, NULL)", (username, password))
+  cursor.execute("INSERT INTO users VALUES (%s, %s, NULL)", (username, password))
   connection.commit()
 
 def get_username(token):
@@ -29,7 +29,7 @@ def get_username(token):
 def login(username, password):
   token = generate_token()
   cursor.execute(
-    "UPDATE users SET token = ? WHERE username = ? AND password = ?", (token, username, password)
+    "UPDATE users SET token = %s WHERE username = %s AND password = %s", (token, username, password)
   )
   connection.commit()
 
