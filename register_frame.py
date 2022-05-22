@@ -1,5 +1,8 @@
+from socket import socket
 from tkinter import Tk, Text, TOP, BOTH, X, N, LEFT, RIGHT
 from tkinter.ttk import Frame, Label, Entry, Button
+import user_controller
+import yaml
 
 class SimpleDialog(Frame):
 
@@ -8,6 +11,13 @@ class SimpleDialog(Frame):
         self.username = ""
         self.password = ""
         self.confirm_password = ""
+
+        config_file = open("config.yaml", 'r')
+        config = yaml.safe_load(config_file)
+        self.config_sizes = config['sizes']
+        self.message_types = config['message_types']
+        self.config_flags = config['flags']
+
         self.initUI()
 
     def initUI(self):
@@ -49,25 +59,18 @@ class SimpleDialog(Frame):
         btn.pack(padx=5, pady=10)
 
     def onRegister(self):
+        socket = user_controller.connect()
+        user_controller.register(
+            socket, self.entry1.get(), self.entry2.get()
+        )
 
-        self.username = self.entry1.get()
-        self.password = self.entry2.get()
-        self.confirm_password = self.entry3.get()
-        self.quit()
+        socket.close()
+
+        self.master.destroy()
 
 def main():
-
-    root = Tk()    
-    app = SimpleDialog()
-    root.mainloop()        
-    user_input = (app.username, app.password)
-    print(app.username)
-    try:
-        root.destroy()
-    except:
-        pass                
-    return user_input
+    SimpleDialog()
 
 if __name__ == '__main__':
-    follow_on_variable = main()    
+    follow_on_variable = main()
     print(follow_on_variable)

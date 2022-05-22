@@ -1,12 +1,9 @@
 import login_frame
 import register_frame
 import alter_password_frame
+import user_controller
 
-from tkinter import *
-from tkinter import ttk
-from tkinter import simpledialog
-from tkinter import filedialog
-from tkinter import messagebox
+from tkinter import ttk, filedialog, messagebox, END, Tk, Text
 
 from dotenv import load_dotenv
 import yaml
@@ -16,21 +13,11 @@ load_dotenv()
 
 import threading
 
-import socket
-
-HOST = str(os.getenv('host'))
-PORT = int(os.getenv('port'))
-
 config_file = open("config.yaml", 'r')
 config = yaml.safe_load(config_file)
 config_sizes = config['sizes']
 message_types = config['message_types']
 config_flags = config['flags']
-
-udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-dest = (HOST, PORT)
-udp.connect(dest)
 
 def send_message():
   try:
@@ -168,7 +155,8 @@ def logout():
     udp.close()
     root.destroy()
 
-token = login().decode()
+token = login_frame.main()
+udp = user_controller.connect()
 # alter_password()
 
 root = Tk()

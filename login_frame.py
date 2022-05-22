@@ -1,13 +1,14 @@
-from tkinter import Tk, Text, TOP, BOTH, X, N, LEFT, RIGHT
+from tkinter import Tk, BOTH, X, LEFT
 from tkinter.ttk import Frame, Label, Entry, Button
+import user_controller
 import register_frame
 
-class SimpleDialog(Frame):
+# Good habit to put your GUI in a class to make it self-contained
+class loginframe(Frame):
 
     def __init__(self):
         super().__init__()
-        self.output1 = ""
-        self.output2 = ""
+        self.token = ''
         self.initUI()
 
     def initUI(self):
@@ -21,7 +22,7 @@ class SimpleDialog(Frame):
         lbl1 = Label(frame1, text="Usuário:", width=6)
         lbl1.pack(side=LEFT, padx=5, pady=10)
 
-        self.entry1 = Entry(frame1, textvariable=self.output1)
+        self.entry1 = Entry(frame1)
         self.entry1.pack(fill=X, padx=5, expand=True)
 
         frame2 = Frame(self)
@@ -42,26 +43,30 @@ class SimpleDialog(Frame):
         btn.pack(padx=5, pady=10)
 
     def onLogin(self):
+        socket = user_controller.connect()
+        self.token = user_controller.login(
+            socket, self.entry1.get(), self.entry2.get()
+        )
+        socket.close()
 
-        self.output1 = self.entry1.get()
-        self.output2 = self.entry2.get()
         self.quit()
-    
+
     def onRegister(self):
+        self.master.destroy()
         register_frame.main()
 
 def main():
 
     root = Tk()
-    app = SimpleDialog()
+    app = loginframe()
     root.mainloop()
-    user_input = (app.output1, app.output2)
-    print(app.output1)
+
     try:
         root.destroy()
     except:
         pass
-    return user_input
+
+    return app.token
 
 if __name__ == '__main__':
     follow_on_variable = main()
