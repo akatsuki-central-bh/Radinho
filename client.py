@@ -161,7 +161,7 @@ def alter_password():
 
   udp.send(f"{message_types['alter_password']}{token}{current_password}{new_password}".encode())
 
-token = login()
+token = login().decode()
 alter_password()
 
 root = Tk()
