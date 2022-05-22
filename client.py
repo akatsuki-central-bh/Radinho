@@ -112,23 +112,6 @@ def login():
     token_response = login()
   return token_response
 
-def register():
-  user = register_frame.main()
-
-  username = user[0]
-  password = user[1]
-
-  username = username.ljust(config_sizes['username'], ' ')
-  password = password.ljust(config_sizes['password'], ' ')
-
-  udp.send(f"{message_types['register']}{username}{password}".encode())
-  msg_type = udp.recv(config_sizes['type']).decode()
-
-  if msg_type == config_flags['success']:
-    return
-
-  register()
-
 def alter_password():
   passwords = alter_password_frame.main()
 
