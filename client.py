@@ -169,7 +169,7 @@ def logout():
     root.destroy()
 
 token = login().decode()
-alter_password()
+# alter_password()
 
 root = Tk()
 root.protocol("WM_DELETE_WINDOW", logout)
