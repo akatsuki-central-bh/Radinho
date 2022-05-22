@@ -1,6 +1,7 @@
 from socket import socket
 from tkinter import Tk, Text, TOP, BOTH, X, N, LEFT, RIGHT
 from tkinter.ttk import Frame, Label, Entry, Button
+import login_frame
 import user_controller
 import yaml
 
@@ -8,6 +9,7 @@ class SimpleDialog(Frame):
 
     def __init__(self, socket):
         super().__init__()
+        self.token = ''
         self.socket = socket
         self.username = ""
         self.password = ""
@@ -67,7 +69,8 @@ class SimpleDialog(Frame):
         self.master.destroy()
 
 def main(socket):
-    SimpleDialog(socket)
+    app = SimpleDialog(socket)
+    return app.token
 
 if __name__ == '__main__':
     follow_on_variable = main()

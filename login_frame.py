@@ -52,10 +52,9 @@ class loginframe(Frame):
 
     def onRegister(self):
         self.master.destroy()
-        register_frame.main(self.socket)
+        self.token = register_frame.main(self.socket)
 
 def main(socket):
-
     root = Tk()
     app = loginframe(socket)
     root.mainloop()

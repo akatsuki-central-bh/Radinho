@@ -106,21 +106,11 @@ def read_content():
   return response[:-10]
 
 def login():
-  user = login_frame.main()
+  token_response = login_frame.main(udp)
 
-  username = user[0]
-  password = user[1]
-
-  username = username.ljust(config_sizes['username'], ' ')
-  password = password.ljust(config_sizes['password'], ' ')
-
-  udp.send(f"{message_types['login']}{username}{password}".encode())
-  msg_type = udp.recv(config_sizes['type']).decode()
-
-  if msg_type == config_flags['token']:
-    return udp.recv(config_sizes['token'])
-  else:
-    login()
+  if token_response == '':
+    token_response = login()
+  return token_response
 
 def register():
   user = register_frame.main()
@@ -157,11 +147,10 @@ def logout():
 
 udp = user_controller.connect()
 
-token = login_frame.main(udp)
+token = login()
+breakpoint()
+
 token = token.decode()
-
-
-# alter_password()
 
 root = Tk()
 root.protocol("WM_DELETE_WINDOW", logout)
