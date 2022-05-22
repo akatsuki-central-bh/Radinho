@@ -42,8 +42,6 @@ def handle(client):
 
       if(msg_type == message_types['register']):
         register(client)
-      elif(msg_type == message_types['alter_password']):
-        alter_password(client)
       elif(msg_type == message_types['login']):
         login(client)
       elif(msg_type == message_types['logout']):
@@ -62,13 +60,6 @@ def register(client):
 
   client.send(config_flags['success'].encode())
 
-def alter_password(client):
-  token = client.recv(config_sizes['token']).decode()
-  current_password = client.recv(config_sizes['password']).decode().rstrip()
-  new_password = client.recv(config_sizes['password']).decode().rstrip()
-  database.alter_password(token, current_password, new_password)
-
-  client.send(config_flags['success'].encode())
 def login(client):
   username = client.recv(config_sizes['username']).decode().rstrip()
   password = client.recv(config_sizes['password']).decode().rstrip()

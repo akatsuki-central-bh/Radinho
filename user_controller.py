@@ -42,14 +42,5 @@ def register(socket, username, password):
   response = socket.recv(config_sizes['type']).decode()
   return response == config_flags['success']
 
-def alter_password(socket, current_password, new_password, token):
-  current_password = current_password.ljust(config_sizes['password'], ' ')
-  new_password = new_password.ljust(config_sizes['password'], ' ')
-
-  socket.send(f"{message_types['alter_password']}{token}{current_password}{new_password}".encode())
-
-  msg_type = socket.recv(config_sizes['type']).decode()
-  return msg_type == config_flags['success']
-
 def logout(socket, token):
   socket.send(f"{message_types['logout']}{token}".encode())

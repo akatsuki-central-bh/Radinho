@@ -1,6 +1,5 @@
 import login_frame
 import register_frame
-import alter_password_frame
 import user_controller
 
 from tkinter import ttk, filedialog, messagebox, END, Tk, Text
@@ -112,17 +111,6 @@ def login():
     token_response = login()
   return token_response
 
-def alter_password():
-  passwords = alter_password_frame.main()
-
-  current_password = passwords[0]
-  new_password = passwords[1]
-
-  current_password = current_password.ljust(config_sizes['password'], ' ')
-  new_password = new_password.ljust(config_sizes['password'], ' ')
-
-  udp.send(f"{message_types['alter_password']}{token}{current_password}{new_password}".encode())
-
 def logout():
   if messagebox.askokcancel("Sair", "Você realmente quer sair?"):
     udp.close()
@@ -148,7 +136,6 @@ text_input.grid(column=0, row=2)
 
 ttk.Button(frame, text='enviar', command = lambda:send_message()).grid(column=1, row=2)
 ttk.Button(frame, text='Anexar arquivo', command = lambda:select_files()).grid(column=2, row=2)
-ttk.Button(frame, text='Alterar senha', command = lambda:alter_password()).grid(column=3, row=2)
 
 threading.Thread(target=listen, args=[]).start()
 root.mainloop()
