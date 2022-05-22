@@ -39,7 +39,6 @@ def handle(client):
     while True:
       msg_type = client.recv(config_sizes['type'])
       msg_type = msg_type.decode()
-
       if(msg_type == message_types['register']):
         register(client)
       elif(msg_type == message_types['alter_password']):
@@ -69,8 +68,9 @@ def alter_password(client):
 
   client.send(message_types['success'].encode())
 def login(client):
-  username = client.recv(config_sizes['username'])
-  password = client.recv(config_sizes['password'])
+  username = client.recv(config_sizes['username']).decode().rstrip()
+  password = client.recv(config_sizes['password']).decode().rstrip()
+  # breakpoint()
   token = connector.login(username, password)
 
   success_message = config_flags['token'] + token + config_flags['end']
