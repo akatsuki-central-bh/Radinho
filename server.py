@@ -56,11 +56,12 @@ def handle(client):
     client.close()
 
 def register(client):
-  username = client.recv(config_sizes['username'])
-  password = client.recv(config_sizes['password'])
+  username = client.recv(config_sizes['username']).decode().rstrip()
+  password = client.recv(config_sizes['password']).decode().rstrip()
   connector.create_user(username, password)
 
-  client.send(message_types['success'].encode())
+  client.send(config_flags['success'].encode())
+
 def alter_password(client):
   token = client.recv(config_sizes['token'])
   new_password = client.recv(config_sizes['password'])
