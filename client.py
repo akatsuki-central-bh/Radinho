@@ -144,7 +144,6 @@ def register():
   udp.send(f"{message_types['register']}{username}{password}".encode())
   msg_type = udp.recv(config_sizes['type']).decode()
 
-  breakpoint()
   if msg_type == config_flags['success']:
     return
 
