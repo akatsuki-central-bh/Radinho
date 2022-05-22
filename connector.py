@@ -17,8 +17,9 @@ def get_username(token):
   cursor.execute("SELECT username FROM users WHERE token = :token LIMIT 1", {"token": token})
   return cursor.fetchone()[0]
 
-def alter_password(token, new_password, current_password):
-  cursor.execute("UPDATE users SET password = ? WHERE token = ? AND password = ?", (token, new_password, current_password))
+def alter_password(token, current_password, new_password):
+  breakpoint()
+  cursor.execute("UPDATE users SET password = ? WHERE token = ? AND password = ?", (new_password, token, current_password))
   connection.commit()
 
 def login(username, password):

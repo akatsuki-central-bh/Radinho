@@ -1,5 +1,6 @@
 import login_frame
 import register_frame
+import alter_password_frame
 
 from tkinter import *
 from tkinter import ttk
@@ -144,14 +145,26 @@ def register():
   udp.send(f"{message_types['register']}{username}{password}".encode())
   msg_type = udp.recv(config_sizes['type']).decode()
 
-  breakpoint()
   if msg_type == config_flags['success']:
     return
 
   register()
 
-register()
-token = login().decode()
+def alter_password():
+  passwords = alter_password_frame.main()
+
+  current_password = passwords[0]
+  new_password = passwords[1]
+
+  breakpoint()
+
+  current_password = current_password.ljust(config_sizes['password'], ' ')
+  new_password = new_password.ljust(config_sizes['password'], ' ')
+
+  udp.send(f"{message_types['alter_password']}{token}{current_password}{new_password}".encode())
+
+token = 'ccf30b4fafb3391d'
+alter_password()
 
 root = Tk()
 frame = ttk.Frame(root, padding=10)
