@@ -2,8 +2,6 @@ from tkinter import Tk, BOTH, X, LEFT
 from tkinter.ttk import Frame, Label, Entry, Button
 import database
 import register_frame
-
-# Good habit to put your GUI in a class to make it self-contained
 class loginframe(Frame):
 
     def __init__(self, socket):
@@ -43,7 +41,7 @@ class loginframe(Frame):
         btn = Button(frame3, text="Cadastro", command=self.onRegister)
         btn.pack(padx=5, pady=10)
 
-        self.protocol("WM_DELETE_WINDOW", onClose)
+        # self.protocol("WM_DELETE_WINDOW", onClose)
 
     def onClose():
         self.token = "exit"
