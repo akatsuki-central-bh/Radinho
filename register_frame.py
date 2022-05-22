@@ -1,8 +1,7 @@
 from socket import socket
 from tkinter import Tk, Text, TOP, BOTH, X, N, LEFT, RIGHT
 from tkinter.ttk import Frame, Label, Entry, Button
-import login_frame
-import user_controller
+import database
 import yaml
 
 class SimpleDialog(Frame):
@@ -62,8 +61,8 @@ class SimpleDialog(Frame):
         btn.pack(padx=5, pady=10)
 
     def onRegister(self):
-        user_controller.register(
-            self.socket, self.entry1.get(), self.entry2.get()
+        database.create_user(
+            self.entry1.get(), self.entry2.get()
         )
 
         self.master.destroy()

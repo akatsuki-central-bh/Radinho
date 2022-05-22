@@ -1,6 +1,6 @@
 import login_frame
-import register_frame
 import user_controller
+import database
 
 from tkinter import ttk, filedialog, messagebox, END, Tk, Text
 
@@ -113,6 +113,7 @@ def login():
 
 def logout():
   if messagebox.askokcancel("Sair", "Você realmente quer sair?"):
+    database.logout(token)
     udp.close()
     root.destroy()
 

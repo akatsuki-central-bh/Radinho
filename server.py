@@ -39,38 +39,11 @@ def handle(client):
     while True:
       msg_type = client.recv(config_sizes['type'])
       msg_type = msg_type.decode()
-
-      if(msg_type == message_types['register']):
-        register(client)
-      elif(msg_type == message_types['login']):
-        login(client)
-      elif(msg_type == message_types['logout']):
-        logout(client)
-      else:
-        default_flow(msg_type, client)
+      default_flow(msg_type, client)
   except:
     print('sheesh')
     clients.remove(client)
     client.close()
-
-def register(client):
-  username = client.recv(config_sizes['username']).decode().rstrip()
-  password = client.recv(config_sizes['password']).decode().rstrip()
-  database.create_user(username, password)
-
-  client.send(config_flags['success'].encode())
-
-def login(client):
-  username = client.recv(config_sizes['username']).decode().rstrip()
-  password = client.recv(config_sizes['password']).decode().rstrip()
-
-  token = database.login(username, password)
-  client.send(config_flags['token'].encode())
-  client.send(token.encode())
-
-def logout(client):
-  token = client.recv(config_sizes['token'])
-  database.logout(token)
 
 def default_flow(msg_type, client):
   token = client.recv(config_sizes['token']).decode()

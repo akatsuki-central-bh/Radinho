@@ -1,7 +1,16 @@
-import sqlite3
+import mysql.connector
 import secrets
+import os
+from dotenv import load_dotenv
 
-connection = sqlite3.connect('database.db', check_same_thread=False)
+load_dotenv()
+
+connection = mysql.connector.connect(
+  user=str(os.getenv('user')),
+  password=str(os.getenv('password')),
+  host=str(os.getenv('host')),
+  database=str(os.getenv('database'))
+)
 
 cursor = connection.cursor()
 

@@ -1,6 +1,6 @@
 from tkinter import Tk, BOTH, X, LEFT
 from tkinter.ttk import Frame, Label, Entry, Button
-import user_controller
+import database
 import register_frame
 
 # Good habit to put your GUI in a class to make it self-contained
@@ -43,9 +43,15 @@ class loginframe(Frame):
         btn = Button(frame3, text="Cadastro", command=self.onRegister)
         btn.pack(padx=5, pady=10)
 
+        self.protocol("WM_DELETE_WINDOW", onClose)
+
+    def onClose():
+        self.token = "exit"
+        self.quit
+
     def onLogin(self):
-        self.token = user_controller.login(
-            self.socket, self.entry1.get(), self.entry2.get()
+        self.token = database.login(
+            self.entry1.get(), self.entry2.get()
         )
 
         self.quit()
