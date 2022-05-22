@@ -83,7 +83,9 @@ def logout(client):
 
 def default_flow(msg_type, client):
   token = client.recv(config_sizes['token']).decode()
-  author = connector.get_username(token).encode()
+  author = connector.get_username(token)
+  author = author.ljust(config_sizes['username'], ' ').encode()
+
   packages = [msg_type.encode(), author]
 
   while(True):
