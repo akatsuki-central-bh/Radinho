@@ -63,7 +63,7 @@ def register(client):
   client.send(config_flags['success'].encode())
 
 def alter_password(client):
-  token = client.recv(config_sizes['token']).decode().rstrip()
+  token = client.recv(config_sizes['token']).decode()
   current_password = client.recv(config_sizes['password']).decode().rstrip()
   new_password = client.recv(config_sizes['password']).decode().rstrip()
   connector.alter_password(token, current_password, new_password)
