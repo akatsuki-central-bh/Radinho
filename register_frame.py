@@ -6,8 +6,9 @@ import yaml
 
 class SimpleDialog(Frame):
 
-    def __init__(self):
+    def __init__(self, socket):
         super().__init__()
+        self.socket = socket
         self.username = ""
         self.password = ""
         self.confirm_password = ""
@@ -59,17 +60,14 @@ class SimpleDialog(Frame):
         btn.pack(padx=5, pady=10)
 
     def onRegister(self):
-        socket = user_controller.connect()
         user_controller.register(
-            socket, self.entry1.get(), self.entry2.get()
+            self.socket, self.entry1.get(), self.entry2.get()
         )
-
-        socket.close()
 
         self.master.destroy()
 
-def main():
-    SimpleDialog()
+def main(socket):
+    SimpleDialog(socket)
 
 if __name__ == '__main__':
     follow_on_variable = main()

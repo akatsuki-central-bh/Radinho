@@ -155,8 +155,12 @@ def logout():
     udp.close()
     root.destroy()
 
-token = login_frame.main()
 udp = user_controller.connect()
+
+token = login_frame.main(udp)
+token = token.decode()
+
+
 # alter_password()
 
 root = Tk()

@@ -6,9 +6,10 @@ import register_frame
 # Good habit to put your GUI in a class to make it self-contained
 class loginframe(Frame):
 
-    def __init__(self):
+    def __init__(self, socket):
         super().__init__()
         self.token = ''
+        self.socket = socket
         self.initUI()
 
     def initUI(self):
@@ -43,22 +44,20 @@ class loginframe(Frame):
         btn.pack(padx=5, pady=10)
 
     def onLogin(self):
-        socket = user_controller.connect()
         self.token = user_controller.login(
-            socket, self.entry1.get(), self.entry2.get()
+            self.socket, self.entry1.get(), self.entry2.get()
         )
-        socket.close()
 
         self.quit()
 
     def onRegister(self):
         self.master.destroy()
-        register_frame.main()
+        register_frame.main(self.socket)
 
-def main():
+def main(socket):
 
     root = Tk()
-    app = loginframe()
+    app = loginframe(socket)
     root.mainloop()
 
     try:
