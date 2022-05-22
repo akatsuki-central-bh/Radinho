@@ -131,7 +131,6 @@ def logout():
 udp = user_controller.connect()
 
 token = login()
-breakpoint()
 
 token = token.decode()
 
@@ -149,6 +148,7 @@ text_input.grid(column=0, row=2)
 
 ttk.Button(frame, text='enviar', command = lambda:send_message()).grid(column=1, row=2)
 ttk.Button(frame, text='Anexar arquivo', command = lambda:select_files()).grid(column=2, row=2)
+ttk.Button(frame, text='Alterar senha', command = lambda:alter_password()).grid(column=3, row=2)
 
 threading.Thread(target=listen, args=[]).start()
 root.mainloop()
