@@ -6,6 +6,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import simpledialog
 from tkinter import filedialog
+from tkinter import messagebox
 
 from dotenv import load_dotenv
 import yaml
@@ -84,8 +85,9 @@ def listen():
         read_message(msg_author.decode().rstrip())
       elif(msg_type.decode() == message_types['file']):
         save_file(msg_author.decode().rstrip())
-    except UnicodeDecodeError as e:
-      print(f'msg_type: {msg_type}, msg_author: {msg_author}')
+    except:
+      print("Conexão encerrada!")
+      break
 
 def read_message(msg_author):
   content = read_content()
@@ -161,10 +163,16 @@ def alter_password():
 
   udp.send(f"{message_types['alter_password']}{token}{current_password}{new_password}".encode())
 
+def logout():
+  if messagebox.askokcancel("Sair", "Você realmente quer sair?"):
+    udp.close()
+    root.destroy()
+
 token = login().decode()
 alter_password()
 
 root = Tk()
+root.protocol("WM_DELETE_WINDOW", logout)
 frame = ttk.Frame(root, padding=10)
 frame.grid()
 ttk.Label(frame, text='Chat dos menores').grid(column=0, row=0)
