@@ -12,7 +12,7 @@ message_types = config['message_types']
 config_flags = config['flags']
 
 def connect():
-  HOST = str(os.getenv('host'))
+  HOST = str(os.getenv('server_host'))
   PORT = int(os.getenv('port'))
 
   dest = (HOST, PORT)
