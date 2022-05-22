@@ -1,4 +1,5 @@
 import login_frame
+import register_frame
 
 from tkinter import *
 from tkinter import ttk
@@ -131,6 +132,24 @@ def login():
   else:
     login()
 
+def register():
+  user = register_frame.main()
+
+  username = user[0]
+  password = user[1]
+
+  username = username.ljust(config_sizes['username'], ' ')
+  password = password.ljust(config_sizes['password'], ' ')
+
+  udp.send(f"{message_types['register']}{username}{password}".encode())
+  msg_type = udp.recv(config_sizes['type']).decode()
+
+  if msg_type == config_flags['success']:
+    return
+
+  register()
+
+register()
 token = login().decode()
 
 root = Tk()
