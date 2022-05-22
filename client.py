@@ -156,14 +156,12 @@ def alter_password():
   current_password = passwords[0]
   new_password = passwords[1]
 
-  breakpoint()
-
   current_password = current_password.ljust(config_sizes['password'], ' ')
   new_password = new_password.ljust(config_sizes['password'], ' ')
 
   udp.send(f"{message_types['alter_password']}{token}{current_password}{new_password}".encode())
 
-token = 'ccf30b4fafb3391d'
+token = login()
 alter_password()
 
 root = Tk()
