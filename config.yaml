@@ -8,11 +8,6 @@ sizes:
 message_types:
   message: 'MESG'
   file: 'FILE'
-  register: 'CADT'
-  alter_password: 'ALTS'
-  delete_user: 'DELU'
-  login: 'LOGN'
-  logout: 'LOGT'
 
 flags:
   success: 'SUSS'

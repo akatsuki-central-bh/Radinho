@@ -1,12 +1,7 @@
-import login_frame
-import register_frame
-import alter_password_frame
+import database
 
-from tkinter import *
-from tkinter import ttk
-from tkinter import simpledialog
-from tkinter import filedialog
-from tkinter import messagebox
+from tkinter import Tk, ttk, filedialog, messagebox, END, Text
+from tkinter.ttk import Frame
 
 from dotenv import load_dotenv
 import yaml
@@ -15,176 +10,141 @@ import os
 load_dotenv()
 
 import threading
-
 import socket
 
-HOST = str(os.getenv('host'))
-PORT = int(os.getenv('port'))
+class Client(Frame):
+  def __init__(self, token, master = None):
+    self.master = master
+    self.frame = Frame(master, padding=10)
+    self.token = token
 
-config_file = open("config.yaml", 'r')
-config = yaml.safe_load(config_file)
-config_sizes = config['sizes']
-message_types = config['message_types']
-config_flags = config['flags']
+    HOST = str(os.getenv('server_host'))
+    PORT = int(os.getenv('port'))
 
-udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    config_file = open("config.yaml", 'r')
+    config = yaml.safe_load(config_file)
+    self.config_sizes = config['sizes']
+    self.message_types = config['message_types']
+    self.config_flags = config['flags']
 
-dest = (HOST, PORT)
-udp.connect(dest)
+    self.udp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-def send_message():
-  try:
-    input = text_input.get('1.0', 'end-1c')
-    text_area.insert(END, f'você: {input}\n')
-    flag_message = message_types['message']
-    udp.send(f'{flag_message}{token}{input}'.encode())
-    udp.send(config_flags['end'].encode())
-  except BrokenPipeError as e:
-    print(e)
+    dest = (HOST, PORT)
+    self.udp.connect(dest)
 
-def select_files():
-  filetypes = (
-    ('All files', '*.*'),
-    ('text files', '*.txt')
-  )
+    self.frame.grid()
+    ttk.Label(self.frame, text='Chat dos menores').grid(column=0, row=0)
 
-  path_name = filedialog.askopenfilename(
-    title='Open files',
-    initialdir='/',
-    filetypes=filetypes)
+    self.text_area = Text(self.frame, height = 20, width = 50)
+    self.text_area.grid(column=0, row=1, columnspan=3)
 
-  file_name = os.path.basename(path_name)
-  file = open(path_name, 'rb')
+    self.text_input = Text(self.frame, height = 1, width = 25)
+    self.text_input.grid(column=0, row=2)
 
-  file_name_ljust = file_name.ljust(config_sizes['file_name'], ' ')
+    ttk.Button(self.frame, text='enviar', command = lambda:self.send_message()).grid(column=1, row=2)
+    ttk.Button(self.frame, text='Anexar arquivo', command = lambda:self.select_files()).grid(column=2, row=2)
 
-  flag_file = message_types['file']
-  udp.send(f'{flag_file}{token}{file_name_ljust}'.encode())
-  package = file.read(1024)
+    master.protocol("WM_DELETE_WINDOW", self.logout)
 
-  message_size = len(package)
-  while(package):
-    udp.send(package)
-    package = file.read(1024)
-    message_size += len(package)
-
-  print(f'sended package: {message_size}')
-  udp.send(config_flags['end'].encode())
-  file.close()
-
-  text_area.insert(END, f'você: {file_name} enviado\n')
-  print('Done Sending')
-
-def listen():
-  while True:
+  def send_message(self):
     try:
-      msg_type = udp.recv(config_sizes['type'])
-      msg_author = udp.recv(config_sizes['username'])
+      message = self.text_input.get('1.0', 'end-1c')
+      self.text_area.insert(END, f'você: {message}\n')
+      flag_message = self.message_types['message']
+      self.udp.send(f'{flag_message}{self.token}{message}'.encode())
+      self.udp.send(self.config_flags['end'].encode())
+    except BrokenPipeError as e:
+      print(e)
 
-      if(msg_type.decode() == message_types['message']):
-        read_message(msg_author.decode().rstrip())
-      elif(msg_type.decode() == message_types['file']):
-        save_file(msg_author.decode().rstrip())
-    except:
-      print("Conexão encerrada!")
-      break
+  def select_files(self):
+    filetypes = (
+      ('All files', '*.*'),
+      ('text files', '*.txt')
+    )
 
-def read_message(msg_author):
-  content = read_content()
-  text_area.insert(END, f'{msg_author}: {content.decode()}\n')
+    path_name = filedialog.askopenfilename(
+      title='Open files',
+      initialdir='/',
+      filetypes=filetypes)
 
-def save_file(msg_author):
-  file_name = udp.recv(config_sizes['file_name']).decode().rstrip()
-  file = open(f'download/{file_name}', 'wb')
-  content = read_content()
+    file_name = os.path.basename(path_name)
+    file = open(path_name, 'rb')
 
-  print(f'file size: {len(content)}')
+    file_name_ljust = file_name.ljust(self.config_sizes['file_name'], ' ')
 
-  file.write(content)
-  file.close()
-  text_area.insert(END, f'{msg_author} enviou um arquivo: {file_name}\n')
+    flag_file = self.message_types['file']
+    self.udp.send(f'{flag_file}{self.token}{file_name_ljust}'.encode())
+    package = file.read(1024)
 
-def read_content():
-  package = udp.recv(1024)
-  response = package
+    message_size = len(package)
+    while(package):
+      self.udp.send(package)
+      package = file.read(1024)
+      message_size += len(package)
 
-  while(True):
-    end_flag = package[-10:]
-    if(end_flag == config_flags['end'].encode()):
-      break
+    print(f'sended package: {message_size}')
+    self.udp.send(self.config_flags['end'].encode())
+    file.close()
 
-    package = udp.recv(1024)
-    response += package
+    self.text_area.insert(END, f'você: {file_name} enviado\n')
+    print('Done Sending')
 
-  return response[:-10]
+  def listen(self):
+    while True:
+      try:
+        msg_type = self.udp.recv(self.config_sizes['type'])
+        msg_author = self.udp.recv(self.config_sizes['username'])
 
-def login():
-  user = login_frame.main()
+        if(msg_type.decode() == self.message_types['message']):
+          self.read_message(msg_author.decode().rstrip())
+        elif(msg_type.decode() == self.message_types['file']):
+          self.save_file(msg_author.decode().rstrip())
+      except Exception as e:
+        print(e)
+        break
 
-  username = user[0]
-  password = user[1]
+  def read_message(self, msg_author):
+    content = self.read_content()
+    self.text_area.insert(END, f'{msg_author}: {content.decode()}\n')
 
-  username = username.ljust(config_sizes['username'], ' ')
-  password = password.ljust(config_sizes['password'], ' ')
+  def save_file(self, msg_author):
+    file_name = self.udp.recv(self.config_sizes['file_name']).decode().rstrip()
+    file = open(f'download/{file_name}', 'wb')
+    content = self.read_content()
 
-  udp.send(f"{message_types['login']}{username}{password}".encode())
-  msg_type = udp.recv(config_sizes['type']).decode()
+    print(f'file size: {len(content)}')
 
-  if msg_type == config_flags['token']:
-    return udp.recv(config_sizes['token'])
-  else:
-    login()
+    file.write(content)
+    file.close()
+    self.text_area.insert(END, f'{msg_author} enviou um arquivo: {file_name}\n')
 
-def register():
-  user = register_frame.main()
+  def read_content(self):
+    package = self.udp.recv(1024)
+    response = package
 
-  username = user[0]
-  password = user[1]
+    while(True):
+      end_flag = package[-10:]
+      if(end_flag == self.config_flags['end'].encode()):
+        break
 
-  username = username.ljust(config_sizes['username'], ' ')
-  password = password.ljust(config_sizes['password'], ' ')
+      package = self.udp.recv(1024)
+      response += package
 
-  udp.send(f"{message_types['register']}{username}{password}".encode())
-  msg_type = udp.recv(config_sizes['type']).decode()
+    return response[:-10]
 
-  if msg_type == config_flags['success']:
-    return
+  def logout(self):
+    try:
+      if messagebox.askokcancel("Sair", "Você realmente quer sair?"):
+        database.logout(self.token)
+        self.udp.close()
+    finally:
+      self.master.destroy()
 
-  register()
+def main(token):
+  root = Tk()
 
-def alter_password():
-  passwords = alter_password_frame.main()
+  client = Client(token, root)
 
-  current_password = passwords[0]
-  new_password = passwords[1]
+  threading.Thread(target=client.listen, args=[]).start()
 
-  current_password = current_password.ljust(config_sizes['password'], ' ')
-  new_password = new_password.ljust(config_sizes['password'], ' ')
-
-  udp.send(f"{message_types['alter_password']}{token}{current_password}{new_password}".encode())
-
-def logout():
-  if messagebox.askokcancel("Sair", "Você realmente quer sair?"):
-    udp.close()
-    root.destroy()
-
-token = login().decode()
-alter_password()
-
-root = Tk()
-root.protocol("WM_DELETE_WINDOW", logout)
-frame = ttk.Frame(root, padding=10)
-frame.grid()
-ttk.Label(frame, text='Chat dos menores').grid(column=0, row=0)
-
-text_area = Text(frame, height = 20, width = 50)
-text_area.grid(column=0, row=1, columnspan=3)
-
-text_input = Text(frame, height = 1, width = 25)
-text_input.grid(column=0, row=2)
-
-ttk.Button(frame, text='enviar', command = lambda:send_message()).grid(column=1, row=2)
-ttk.Button(frame, text='Anexar arquivo', command = lambda:select_files()).grid(column=2, row=2)
-
-threading.Thread(target=listen, args=[]).start()
-root.mainloop()
+  root.mainloop()

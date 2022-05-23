@@ -6,7 +6,7 @@ class SimpleDialog(Frame):
 
     def __init__(self):
         super().__init__()
-        # self allow the variable to be used anywhere in the class
+        self.token = ''
         self.username = ""
         self.password = ""
         self.confirm_password = ""
@@ -51,39 +51,16 @@ class SimpleDialog(Frame):
         btn = Button(frame4, text="Entrar", command=self.onLogin)
         btn.pack(padx=5, pady=10)
 
-    def onLogin(self):
+    def onRegister(self):
+        database.create_user(
+            self.entry1.get(), self.entry2.get()
+        )
 
-        self.username = self.entry1.get()
-        self.password = self.entry2.get()
-        self.confirm_password = self.entry3.get()
-        self.quit()
+        self.master.destroy()
 
 def main():
+    SimpleDialog()
 
-    # This part triggers the dialog
-    root = Tk()
-    # root.geometry("250x150+300+300")
-    app = SimpleDialog()
-    root.mainloop()
-    # Here we can act on the form components or
-    # better yet, copy the output to a new variable
-    user_input = (app.username, app.password)
-    print(app.username)
-    # Get rid of the error message if the user clicks the
-    # close icon instead of the submit button
-    # Any component of the dialog will no longer be available
-    # past this point
-    try:
-        root.destroy()
-    except:
-        pass
-    # To use data outside of function
-    # Can either be used in __main__
-    # or by external script depending on
-    # what calls main()
-    return user_input
-
-# Allow dialog to run either as a script or called from another program
 if __name__ == '__main__':
     follow_on_variable = main()
     # This shows the outputs captured when called directly as `python dual_input.py`
