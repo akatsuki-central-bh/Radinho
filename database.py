@@ -36,7 +36,7 @@ def login(username, password):
   return token
 
 def logout(token):
-  cursor.execute("UPDATE users SET token = NULL WHERE token = %s", (token))
+  cursor.execute("UPDATE users SET token = NULL WHERE token = %s", (token,))
   connection.commit()
 
 def generate_token():

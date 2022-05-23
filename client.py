@@ -121,8 +121,6 @@ udp = user_controller.connect()
 
 token = login()
 
-token = token.decode()
-
 root = Tk()
 root.protocol("WM_DELETE_WINDOW", logout)
 frame = ttk.Frame(root, padding=10)
