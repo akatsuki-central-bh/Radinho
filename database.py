@@ -23,7 +23,7 @@ def create_user(username, password):
   connection.commit()
 
 def get_username(token):
-  cursor.execute("SELECT username FROM users WHERE token = :token LIMIT 1", {"token": token})
+  cursor.execute("SELECT username FROM users WHERE token = %s LIMIT 1", (token,))
   return cursor.fetchone()[0]
 
 def login(username, password):
