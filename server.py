@@ -40,8 +40,8 @@ def handle(client):
       msg_type = client.recv(config_sizes['type'])
       msg_type = msg_type.decode()
       default_flow(msg_type, client)
-  except:
-    print('sheesh')
+  except Exception as e:
+    print(e)
     clients.remove(client)
     client.close()
 
