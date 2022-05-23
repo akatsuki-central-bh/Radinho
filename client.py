@@ -112,9 +112,12 @@ def login():
   return token_response
 
 def logout():
-  if messagebox.askokcancel("Sair", "Você realmente quer sair?"):
-    database.logout(token)
-    udp.close()
+  try:
+    if messagebox.askokcancel("Sair", "Você realmente quer sair?"):
+      database.logout(token)
+      udp.close()
+      root.destroy()
+  except:
     root.destroy()
 
 udp = user_controller.connect()
