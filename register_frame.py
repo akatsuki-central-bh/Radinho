@@ -1,8 +1,8 @@
+import database
 from tkinter import Tk, Text, TOP, BOTH, X, N, LEFT, RIGHT
 from tkinter.ttk import Frame, Label, Entry, Button
 
-# Good habit to put your GUI in a class to make it self-contained
-class SimpleDialog(Frame):
+class registerframe(Frame):
 
     def __init__(self):
         super().__init__()
@@ -47,8 +47,7 @@ class SimpleDialog(Frame):
         frame4 = Frame(self)
         frame4.pack(fill=X)
 
-        # Command tells the form what to do when the button is clicked
-        btn = Button(frame4, text="Entrar", command=self.onLogin)
+        btn = Button(frame4, text="Cadastrar", command=self.onRegister)
         btn.pack(padx=5, pady=10)
 
     def onRegister(self):
@@ -59,9 +58,8 @@ class SimpleDialog(Frame):
         self.master.destroy()
 
 def main():
-    SimpleDialog()
+    registerframe()
 
 if __name__ == '__main__':
     follow_on_variable = main()
-    # This shows the outputs captured when called directly as `python dual_input.py`
     print(follow_on_variable)

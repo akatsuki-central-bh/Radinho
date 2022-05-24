@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 import yaml
 import os
 
-load_dotenv()
-
 import threading
 import socket
+
+load_dotenv()
 
 class Client(Frame):
   def __init__(self, token, master = None):

@@ -3,6 +3,7 @@ from tkinter.ttk import Frame, Label, Entry, Button
 import database
 import client
 import register_frame
+
 class loginframe(Frame):
 
     def __init__(self):
@@ -35,7 +36,6 @@ class loginframe(Frame):
         frame3 = Frame(self)
         frame3.pack(fill=X)
 
-        # Command tells the form what to do when the button is clicked
         btn = Button(frame3, text="Entrar", command=self.onLogin)
         btn.pack(padx=5, pady=10)
         btn = Button(frame3, text="Cadastro", command=self.onRegister)
@@ -60,7 +60,6 @@ def main():
 
 if __name__ == '__main__':
     follow_on_variable = main()
-    # This shows the outputs captured when called directly as `python dual_input.py`
     print(follow_on_variable)
 
 main()
