@@ -1,6 +1,6 @@
 import socket
 import threading
-import connector
+import database
 
 from dotenv import load_dotenv
 import os
@@ -13,7 +13,7 @@ config_sizes = config['sizes']
 message_types = config['message_types']
 config_flags = config['flags']
 
-connector.create_database()
+database.create_database()
 load_dotenv()
 
 clients = []
@@ -39,51 +39,15 @@ def handle(client):
     while True:
       msg_type = client.recv(config_sizes['type'])
       msg_type = msg_type.decode()
-
-      if(msg_type == message_types['register']):
-        register(client)
-      elif(msg_type == message_types['alter_password']):
-        alter_password(client)
-      elif(msg_type == message_types['login']):
-        login(client)
-      elif(msg_type == message_types['logout']):
-        logout(client)
-      else:
-        default_flow(msg_type, client)
-  except:
-    print('sheesh')
+      default_flow(msg_type, client)
+  except Exception as e:
+    print(e)
     clients.remove(client)
     client.close()
 
-def register(client):
-  username = client.recv(config_sizes['username']).decode().rstrip()
-  password = client.recv(config_sizes['password']).decode().rstrip()
-  connector.create_user(username, password)
-
-  client.send(config_flags['success'].encode())
-
-def alter_password(client):
-  token = client.recv(config_sizes['token']).decode()
-  current_password = client.recv(config_sizes['password']).decode().rstrip()
-  new_password = client.recv(config_sizes['password']).decode().rstrip()
-  connector.alter_password(token, current_password, new_password)
-
-  client.send(config_flags['success'].encode())
-def login(client):
-  username = client.recv(config_sizes['username']).decode().rstrip()
-  password = client.recv(config_sizes['password']).decode().rstrip()
-
-  token = connector.login(username, password)
-  client.send(config_flags['token'].encode())
-  client.send(token.encode())
-
-def logout(client):
-  token = client.recv(config_sizes['token'])
-  connector.logout(token)
-
 def default_flow(msg_type, client):
   token = client.recv(config_sizes['token']).decode()
-  author = connector.get_username(token)
+  author = database.get_username(token)
   author = author.ljust(config_sizes['username'], ' ').encode()
 
   packages = [msg_type.encode(), author]
